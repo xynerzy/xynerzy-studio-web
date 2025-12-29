@@ -1,0 +1,35 @@
+{
+  "name": "xynerzy-studio-web",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@shoelace-style/shoelace": "^2.20.1",
+    "abortcontroller-polyfill": "^1.7.8",
+    "axios": "^1.13.1",
+    "crypto-js": "^4.2.0",
+    "cryptojs": "^2.5.3",
+    "jsencrypt": "^3.5.4",
+    "lodash": "^4.17.21",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/cryptojs": "^3.1.33",
+    "@types/lodash": "^4.17.20",
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "dotenv": "^17.2.3",
+    "fs": "^0.0.1-security",
+    "js-yaml": "^4.1.1",
+    "sass": "^1.93.2",
+    "vite": "^7.1.7"
+  }
+}

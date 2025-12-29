@@ -1,0 +1,184 @@
+/**
+ * @File        : proc.ts
+ * @Author      : lupfeliz@gmail.com
+ * @Since       : 2025-12-29
+ * @Description : Execution control module
+ * @Site        : https://github.com/xynerzy
+ **/
+
+import log from './log'
+import values from './values'
+
+const ctxProc = {
+  debounceMap: { } as any,
+  throttleMap: { } as any,
+} as any
+
+const proc = {
+  /* Function call Wrapper */
+  call(fnm: string, fnc: Function, self: any, errproc?: boolean, ...args: any[]) {
+    let ret:any = undefined
+    let argstr = ''
+    log.trace('FNC:', fnc)
+    try {
+      if (self !== undefined) {
+        ret = fnc.call(self, ...args)
+      } else {
+        ret = fnc(...args)
+      }
+      if (ret instanceof Promise) {
+        ret.then(() => {
+          log.trace('THEN:', fnm)
+        })
+        ret.catch((err) => {
+          log.trace('ERROR:', err)
+          if (self && self.$err) {
+            self.$err.handle.call(self, fnm, err)
+          }
+          if (errproc) { throw err; }
+        })
+      }
+    } catch (err) {
+      log.debug('ERROR:', err)
+      if (self && self.$err) {
+        self.$err.handle.call(self, fnm, err)
+      }
+      if (errproc) { throw err; }
+    }
+    if (ret != undefined) {
+      return ret
+    }
+  },
+
+  exec(obj: any, mtd: string, ...args: any[]) {
+    let ret = undefined
+    obj = values.val(obj)
+    if (obj && obj[mtd] && obj[mtd] instanceof Function) {
+      ret = obj[mtd](...args)
+    }
+    return ret
+  },
+
+  until(check: () => any, opt?: { maxcheck?: number, interval?: number }) {
+    if (opt === undefined) { opt = { } }
+    const ctx = {
+      __max_check: opt.maxcheck || 100,
+      __interval: opt.interval || 100
+    }
+    return new Promise<any>((resolve, _reject) => {
+      const fnexec = function() {
+        /* when check is true */
+        if (check()) {
+            resolve(true)
+        } else if (ctx.__max_check > 0) {
+          ctx.__max_check--
+          setTimeout(fnexec, ctx.__interval)
+        } else {
+          resolve(false)
+        }
+      }
+      fnexec()
+    })
+  },
+
+  /* SLEEP (ms) */
+  async sleep(time: number) {
+    return new Promise((resolve, _reject) => {
+      log.trace('SLEEP', time)
+      setTimeout(() => {
+        log.trace('SLEEP DONE!')
+        resolve(null)
+      }, time)
+    })
+  },
+
+  /* debounce with hash */
+  debouncePromise(hash: string, callback: Function, time?: number) {
+    log.trace('TRYING DEBOUNCE HASH:', hash)
+    let ret = new Promise<any>((resolve, reject) => {
+      if (time === undefined) { time = 300; }
+      if (!ctxProc.debounceMap[hash]) {
+        ctxProc.debounceMap[hash] = {
+          handle: false as any,
+          resolveArr: [ ] as Function[],
+          rejectArr: [ ] as Function[]
+        } as any
+      }
+      const map = ctxProc.debounceMap[hash]
+      if (map?.handle) {
+        log.trace('DEBOUNCE FUNCTION WITH HASH:', hash)
+        clearTimeout(map.handle)
+      }
+      map.handle = setTimeout(() => {
+        try {
+          const res = callback()
+          log.trace('RES:', res)
+          for (const resolveOne of map.resolveArr) { resolveOne(res); }
+        } catch (e) {
+          log.debug('ERROR:', e)
+          for (const rejectOne of map.rejectArr) { rejectOne(e); }
+        }
+        /* Process has ended, everything is released. */
+        clearTimeout(map.handle)
+        map.handle = undefined
+        delete ctxProc.debounceMap[hash]
+      }, time)
+      map.resolveArr.push(resolve)
+      map.rejectArr.push(reject)
+    })
+    return ret
+  },
+
+  /* throttle with hash */
+  throttlePromise(hash: string, callback: Function, failproc: Function, time?: number) {
+    log.trace('TRYING THROTTLE HASH:', hash)
+    let ret = new Promise<any>(async (resolve, reject) => {
+      if (time === undefined) { time = 300; }
+      if (!ctxProc.throttleMap[hash]) {
+        ctxProc.throttleMap[hash] = {
+          handle: false as any,
+          complete: true as any,
+          result: undefined as any,
+          error: undefined as any,
+        } as any
+      }
+      /* 1. make handle at throttleMap */
+      const map = ctxProc.throttleMap[hash]
+      if (!(map?.handle)) {
+        /* If there was a throttle applied previously, wait. */
+        if (!map?.complete) { await proc.until(() => map.complete, { maxcheck:1000, interval: 10 }); }
+        map.complete = false
+        map.handle = setTimeout(() => { map.handle = undefined }, time)
+        try {
+          /**
+           * 2. The first process leaves the result in the throttleMap 
+           * 3. The subsequent process is ignored until the handle is freed.
+           **/
+          let res = map.result = callback()
+          if (res && res instanceof Promise) {
+            await res.then(r => { resolve(map.result = r) }, e => { reject(map.error = e) })
+          } else {
+            resolve(res)
+          }
+          log.trace('RES:', res)
+        } catch (e) {
+          map.error = e
+          log.debug('ERROR:', e)
+        }
+        map.complete = true
+      } else {
+        if (failproc && failproc instanceof Function) { failproc(); }
+        log.trace('THROTTLE FUNCTION CANCELED WITH HASH:', hash)
+        await proc.until(() => map.complete, { maxcheck: 1000, interval: 10 })
+        if (map.error) {
+          reject(map.error)
+        } else {
+          resolve(map.result)
+        }
+      }
+    })
+    return ret
+  }
+}
+
+export default proc
