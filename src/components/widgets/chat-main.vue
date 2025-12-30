@@ -2,7 +2,6 @@
 import { ref, useAttrs } from 'vue'
 import * as vue from 'vue'
 import { } from 'axios'
-import { debounce, throttle } from 'lodash'
 const prop = defineProps({
   title: { type: String }
 })
@@ -12,5 +11,7 @@ const emit = defineEmits();
 </script>
 <template>
   <div id="chat-main">
+    <div style="height: 1000rem">
+    </div>
   </div>
 </template>
