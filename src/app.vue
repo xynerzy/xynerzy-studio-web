@@ -9,7 +9,7 @@ import Toolbar from '@/components/shared/toolbar.vue';
   <Header />
   <main>
     <ChatMain />
-    <Toolbar />
   </main>
+  <Toolbar />
   <Footer />
 </template>

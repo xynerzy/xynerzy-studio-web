@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue';
-import ChatMembers from '@/components/widgets/chat-members.vue';
-import ChatMessages from '@/components/widgets/chat-messages.vue';
 const props = defineProps({
-  title: { type: String }
+  messages: { type: Array }
 });
 const attrs = computed(() => {
   const { ...itms } = useAttrs();
   return itms;
 });
 const emit = defineEmits();
-
 </script>
 <template>
   <div
-    id="chat-main"
+    id="chat-messages"
     v-bind="{ ...props, ...attrs }"
     >
-    <ChatMembers />
-    <ChatMessages />
+    <div style="height: 1000rem"></div>
   </div>
 </template>

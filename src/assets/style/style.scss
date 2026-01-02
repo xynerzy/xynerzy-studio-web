@@ -2,57 +2,157 @@
 
 $toolbar-bg: #f8f9fa;
 $active-color: #007bff;
+$toolbar-width: 70px;
+
+/* chat-member item variables */
+$chat-member-color-text-main: #2d3436;
+$chat-member-color-text-sub: #636e72;
+$chat-member-color-unread: #ff7675;
+$chat-member-color-online: #55efc4;
+$hover-bg: #f1f3f5;
+
 /* for tablet or less */
 $breakpoint-mobile: 768px;
 
 html {
   font-family: 'Pretendard';
   font-weight: 400;
-  body {
+  > body {
     /* content area margin */
     margin: 0;
     /* For PC & Tablet */
-    margin-left: 70px;
-    @media (max-width: #{$breakpoint-mobile}) {
-      margin-left: 0;
-      /* For Mobile. Bottom margin */
-      margin-bottom: 60px;
-    }
-    #app {
-      header {
+    margin-left: $toolbar-width;
+    > #app {
+      > header {
         position: fixed;
         top: 0;
         width: calc(100%);
         max-width: 100vw;
         z-index: 999;
       }
-      main {
+      > main {
         position: inherit;
+        > #chat-main {
+          > #chat-members {
+            // border: 1px solid #f00;
+            position: absolute;
+            top: 0;
+            left: calc($toolbar-width);
+            width: calc((100vw - $toolbar-width) / 2);
+            height: 100%;
+            .member-item {
+              display: flex;
+              align-items: center;
+              padding: 12px 16px;
+              cursor: pointer;
+              transition: background 0.2s ease;
+              border-bottom: 1px solid #f1f1f1;
+              &:hover {
+                background-color: $hover-bg;
+              }
+              /* Member image area */
+              .member-avatar {
+                position: relative;
+                margin-right: 12px;
+                /* Fix image size */
+                flex-shrink: 0;
+                img {
+                  width: 50px;
+                  height: 50px;
+                  /* circular border */
+                  border-radius: 50%;
+                  object-fit: cover;
+                  display: block;
+                }
+                .status-online {
+                  position: absolute;
+                  bottom: 2px;
+                  right: 2px;
+                  width: 12px;
+                  height: 12px;
+                  background-color: $chat-member-color-online;
+                  border: 2px solid white;
+                  border-radius: 50%;
+                }
+              }
+              /* Name and descriptions Area */
+              .member-info {
+                /* It takes up the entire remaining space */
+                flex: 1;
+                /* Settings for text ellipsis operation */
+                min-width: 0;
+                .member-name {
+                  margin: 0 0 4px 0;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: $chat-member-color-text-main;
+                }
+                .member-intro {
+                  margin: 0;
+                  font-size: 13px;
+                  color: $chat-member-color-text-sub;
+                  /* Only one line is allowed */
+                  white-space: nowrap;
+                  overflow: hidden;
+                  /* If the length is exceeded, '...' is displayed */
+                  text-overflow: ellipsis;
+                }
+              }
+              /* Meta information Area (Time & badge ..) */
+              .member-meta {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                margin-left: 10px;
+                flex-shrink: 0;
+                .last-updated {
+                  font-size: 11px;
+                  color: $chat-member-color-text-sub;
+                  margin-bottom: 6px;
+                }
+                .unread-count {
+                  background-color: $chat-member-color-unread;
+                  color: white;
+                  font-size: 11px;
+                  font-weight: bold;
+                  padding: 2px 8px;
+                  border-radius: 10px;
+                  min-width: 18px;
+                  text-align: center;
+                }
+              }
+            }
+          }
+          > #chat-messages {
+            border: 1px solid #00f;
+            position: absolute;
+            top: 0;
+            // left: calc($toolbar-width + 1px);
+            left: calc((100vw - $toolbar-width) / 2 + $toolbar-width);
+          }
+        }
       }
-
-      #toolbar {
+      > #toolbar {
         display: flex;
         background-color: $toolbar-bg;
         border-color: #dee2e6;
         border-style: solid;
         position: fixed;
         z-index: 1000;
-
-        /* default settings: PC & Tablet (Vertical Toolbar) */
         left: 0;
         top: 0;
         bottom: 0;
-        width: 70px;
+        width: $toolbar-width;
+        max-width: $toolbar-width;
+        overflow-x: hidden;
         flex-direction: column;
         align-items: center;
         padding-top: 20px;
         border-right-width: 1px;
-
         .menu-item {
           padding: 15px;
           cursor: pointer;
           font-size: 24px;
-          
           &.active {
             color: $active-color;
           }
@@ -71,48 +171,22 @@ html {
             background-repeat: no-repeat;
             &.sms { background-image: url("@/assets/images/icons/sms.svg"); }
             &.conference { background-image: url("@/assets/images/icons/conference_call.svg"); }
+            &.user { background-image: url("@/assets/images/icons/user.svg"); }
             &.services { background-image: url("@/assets/images/icons/services.svg"); }
             &.main-menu { background-image: url("@/assets/images/icons/menu.svg"); }
           }
           > img.avatar {
+            position: relative;
+            top: 0.4rem;
             width: 2rem;
             height: 2rem;
             clip-path: circle(2rem at 1rem, 1rem);
-          }
-        }
-
-        /* reactive settings: Mobile (Bottom Horizontal Toolbar) */
-        @media (max-width: #{$breakpoint-mobile}) {
-          /* Free from Top */
-          top: auto;
-          /* Fixed at Bottom */
-          bottom: 0;
-          left: 0;
-          right: 0;
-          /* Whole width */
-          width: 100%;
-          height: 60px;
-          /* Horizontal */
-          flex-direction: row;
-          /* Distribute item spacing */
-          justify-content: space-around;
-          align-items: center;
-          padding-top: 0;
-          border-right-width: 0;
-          border-top-width: 1px;
-          .menu-item {
-            padding: 10px;
-            &.sub {
-              display: none;
-            }
-            &.main-menu {
-              display: none;
-            }
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            border-radius: 50% 50%;
           }
         }
       }
-
-      footer {
+      > footer {
         transition: opacity 0.1s, transform 0.1s;
         opacity: 1;
       }
@@ -122,3 +196,54 @@ html {
     }
   }
 }
+
+/* reactive settings: Mobile (Bottom Horizontal Toolbar) */
+@media (max-width: #{$breakpoint-mobile}) {
+html {
+  > body {
+    margin-left: 0;
+    /* For Mobile. Bottom margin */
+    margin-bottom: 60px;
+    > #app {
+      > main {
+        > #chat-main {
+          > #chat-members {
+            left: calc($toolbar-width + 2px);
+            width: calc(100vw - $toolbar-width);
+          }
+          > #chat-messages {
+            left: calc($toolbar-width + 2px);
+            width: calc(100vw - $toolbar-width);
+          }
+        }
+      }
+    }
+    > #toolbar {
+    /* Free from Top */
+    top: auto;
+    /* Fixed at Bottom */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* Whole width */
+    width: 100%;
+    height: 60px;
+    /* Horizontal */
+    flex-direction: row;
+    /* Distribute item spacing */
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 0;
+    border-right-width: 0;
+    border-top-width: 1px;
+    > .menu-item {
+      padding: 10px;
+      &.sub {
+        display: none;
+      }
+      &.main-menu {
+        display: none;
+      }
+    } }
+  }
+} }
