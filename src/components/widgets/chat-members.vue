@@ -11,11 +11,12 @@ const emit = defineEmits();
 const getResource = (pth: string) => new URL(pth, import.meta.url).href;
 </script>
 <template>
-  <div
+  <section
     id="chat-members"
     v-bind="{ ...props, ...attrs }"
     >
     <div>
+      <!--[ MEMBER-ITEM -->
       <div class="member-item">
         <div class="member-avatar">
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
@@ -30,6 +31,27 @@ const getResource = (pth: string) => new URL(pth, import.meta.url).href;
           <div class="unread-count">5</div>
         </div>
       </div>
+      <!--] MEMBER-ITEM -->
+      <!--[ MEMBER-ITEM -->
+      <div class="member-item">
+        <div class="member-avatar group">
+          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
+          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
+          <!--
+          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
+          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
+          -->
+        </div>
+        <div class="member-info">
+          <h4 class="member-name">정산방</h4>
+          <p class="member-intro">정산합시다</p>
+        </div>
+        <div class="member-meta">
+          <span class="last-updated">오후 2:30</span>
+          <div class="unread-count">1</div>
+        </div>
+      </div>
+      <!--] MEMBER-ITEM -->
     </div>
-  </div>
+  </section>
 </template>

@@ -10,10 +10,10 @@ const attrs = computed(() => {
 const emit = defineEmits();
 </script>
 <template>
-  <div
+  <section
     id="chat-messages"
     v-bind="{ ...props, ...attrs }"
     >
     <div style="height: 1000rem"></div>
-  </div>
+  </section>
 </template>

@@ -13,11 +13,11 @@ const emit = defineEmits();
 
 </script>
 <template>
-  <div
+  <main
     id="chat-main"
     v-bind="{ ...props, ...attrs }"
     >
     <ChatMembers />
     <ChatMessages />
-  </div>
+  </main>
 </template>

@@ -7,9 +7,7 @@ import Toolbar from '@/components/shared/toolbar.vue';
 </script>
 <template>
   <Header />
-  <main>
-    <ChatMain />
-  </main>
+  <ChatMain />
   <Toolbar />
   <Footer />
 </template>
