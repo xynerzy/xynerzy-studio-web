@@ -32,116 +32,113 @@ html {
       }
       > #chat-main {
         position: inherit;
+        display: flex;
         > #chat-members {
-          // border: 1px solid #f00;
-          position: absolute;
-          top: 0;
-          left: calc($toolbar-width);
-          width: calc((100vw - $toolbar-width) / 2);
-          height: 100%;
-          .member-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            border-bottom: 1px solid #f1f1f1;
-            &:hover {
-              background-color: $hover-bg;
-            }
-            /* Member image area */
-            .member-avatar {
-              position: relative;
-              margin-right: 12px;
-              /* Fix image size */
-              flex-shrink: 0;
-              > img {
-                width: 50px;
-                height: 50px;
-                /* circular border */
-                border-radius: 50%;
-                object-fit: cover;
-                display: block;
+          flex: 1;
+          > dl {
+            margin-top: 0;
+            margin-bottom: 0;
+            .member-item {
+              margin-left: 0;
+              display: flex;
+              align-items: center;
+              padding: 12px 16px;
+              cursor: pointer;
+              transition: background 0.2s ease;
+              border-bottom: 1px solid #f1f1f1;
+              &:hover {
+                background-color: $hover-bg;
               }
-              .status-online {
-                position: absolute;
-                bottom: 2px;
-                right: 2px;
-                width: 12px;
-                height: 12px;
-                background-color: $chat-member-color-online;
-                border: 2px solid white;
-                border-radius: 50%;
-              }
-              &.group {
-                align-items: center;
-                justify-content: center;
-                width: 50px;
-                height: 50px;
-                display: flex;
-                flex-wrap: wrap;
-                border: 1px solid rgba(0, 0, 0, 0.2);
-                border-radius: 50%;
+              /* Member image area */
+              .member-avatar {
+                position: relative;
+                margin-right: 12px;
+                /* Fix image size */
+                flex-shrink: 0;
                 > img {
-                  width: 20px;
-                  height: 20px;
+                  width: 50px;
+                  height: 50px;
+                  /* circular border */
+                  border-radius: 50%;
+                  object-fit: cover;
+                  display: block;
+                }
+                .status-online {
+                  position: absolute;
+                  bottom: 2px;
+                  right: 2px;
+                  width: 12px;
+                  height: 12px;
+                  background-color: $chat-member-color-online;
+                  border: 2px solid white;
+                  border-radius: 50%;
+                }
+                &.group {
+                  align-items: center;
+                  justify-content: center;
+                  width: 50px;
+                  height: 50px;
+                  display: flex;
+                  flex-wrap: wrap;
+                  border: 1px solid rgba(0, 0, 0, 0.2);
+                  border-radius: 50%;
+                  > img {
+                    width: 20px;
+                    height: 20px;
+                  }
                 }
               }
-            }
-            /* Name and descriptions Area */
-            .member-info {
-              /* It takes up the entire remaining space */
-              flex: 1;
-              /* Settings for text ellipsis operation */
-              min-width: 0;
-              .member-name {
-                margin: 0 0 4px 0;
-                font-size: 16px;
-                font-weight: 600;
-                color: $chat-member-color-text-main;
+              /* Name and descriptions Area */
+              .member-info {
+                /* It takes up the entire remaining space */
+                flex: 1;
+                /* Settings for text ellipsis operation */
+                min-width: 0;
+                .member-name {
+                  margin: 0 0 4px 0;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: $chat-member-color-text-main;
+                }
+                .member-intro {
+                  margin: 0;
+                  font-size: 13px;
+                  color: $chat-member-color-text-sub;
+                  /* Only one line is allowed */
+                  white-space: nowrap;
+                  overflow: hidden;
+                  /* If the length is exceeded, '...' is displayed */
+                  text-overflow: ellipsis;
+                }
               }
-              .member-intro {
-                margin: 0;
-                font-size: 13px;
-                color: $chat-member-color-text-sub;
-                /* Only one line is allowed */
-                white-space: nowrap;
-                overflow: hidden;
-                /* If the length is exceeded, '...' is displayed */
-                text-overflow: ellipsis;
-              }
-            }
-            /* Meta information Area (Time & badge ..) */
-            .member-meta {
-              display: flex;
-              flex-direction: column;
-              align-items: flex-end;
-              margin-left: 10px;
-              flex-shrink: 0;
-              .last-updated {
-                font-size: 11px;
-                color: $chat-member-color-text-sub;
-                margin-bottom: 6px;
-              }
-              .unread-count {
-                background-color: $chat-member-color-unread;
-                color: white;
-                font-size: 11px;
-                font-weight: bold;
-                padding: 2px 8px;
-                border-radius: 10px;
-                min-width: 18px;
-                text-align: center;
+              /* Meta information Area (Time & badge ..) */
+              .member-meta {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                margin-left: 10px;
+                flex-shrink: 0;
+                .last-updated {
+                  font-size: 11px;
+                  color: $chat-member-color-text-sub;
+                  margin-bottom: 6px;
+                }
+                .unread-count {
+                  background-color: $chat-member-color-unread;
+                  color: white;
+                  font-size: 11px;
+                  font-weight: bold;
+                  padding: 2px 8px;
+                  border-radius: 10px;
+                  min-width: 18px;
+                  text-align: center;
+                }
               }
             }
           }
         }
         > #chat-messages {
-          // border: 1px solid #00f;
-          position: absolute;
-          top: 0;
-          // left: calc($toolbar-width + 1px);
-          left: calc((100vw - $toolbar-width) / 2 + $toolbar-width);
+          flex: 1;
         }
       }
       > #toolbar {
@@ -219,41 +216,39 @@ html {
     > #app {
       > #chat-main {
         > #chat-members {
-          left: calc($toolbar-width + 2px);
-          width: calc(100vw - $toolbar-width);
         }
         > #chat-messages {
-          left: calc($toolbar-width + 2px);
-          width: calc(100vw - $toolbar-width);
+          display: none;
         }
       }
+      > #toolbar {
+      /* Free from Top */
+      top: auto;
+      /* Fixed at Bottom */
+      bottom: 0;
+      left: 0;
+      right: 0;
+      /* Whole width */
+      width: 100%;
+      height: 60px;
+      max-width: 100%;
+      /* Horizontal */
+      flex-direction: row;
+      /* Distribute item spacing */
+      justify-content: space-around;
+      align-items: center;
+      padding-top: 0;
+      border-right-width: 0;
+      border-top-width: 1px;
+      > .menu-item {
+        padding: 10px;
+        &.sub {
+          display: none;
+        }
+        &.main-menu {
+          display: none;
+        }
+      } }
     }
-    > #toolbar {
-    /* Free from Top */
-    top: auto;
-    /* Fixed at Bottom */
-    bottom: 0;
-    left: 0;
-    right: 0;
-    /* Whole width */
-    width: 100%;
-    height: 60px;
-    /* Horizontal */
-    flex-direction: row;
-    /* Distribute item spacing */
-    justify-content: space-around;
-    align-items: center;
-    padding-top: 0;
-    border-right-width: 0;
-    border-top-width: 1px;
-    > .menu-item {
-      padding: 10px;
-      &.sub {
-        display: none;
-      }
-      &.main-menu {
-        display: none;
-      }
-    } }
   }
 } }

@@ -14,6 +14,11 @@ const emit = defineEmits();
     id="chat-messages"
     v-bind="{ ...props, ...attrs }"
     >
-    <div style="height: 1000rem"></div>
+    <dl>
+      <!--[ MESSAGE-ITEM -->
+      <dd>
+      </dd>
+      <!--] MESSAGE-ITEM -->
+    </dl>
   </section>
 </template>

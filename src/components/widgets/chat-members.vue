@@ -15,9 +15,9 @@ const getResource = (pth: string) => new URL(pth, import.meta.url).href;
     id="chat-members"
     v-bind="{ ...props, ...attrs }"
     >
-    <div>
+    <dl>
       <!--[ MEMBER-ITEM -->
-      <div class="member-item">
+      <dd class="member-item">
         <div class="member-avatar">
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
           <span class="status-online"></span>
@@ -28,12 +28,12 @@ const getResource = (pth: string) => new URL(pth, import.meta.url).href;
         </div>
         <div class="member-meta">
           <span class="last-updated">오후 2:30</span>
-          <div class="unread-count">5</div>
+          <span class="unread-count">5</span>
         </div>
-      </div>
+      </dd>
       <!--] MEMBER-ITEM -->
       <!--[ MEMBER-ITEM -->
-      <div class="member-item">
+      <dd class="member-item">
         <div class="member-avatar group">
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
@@ -48,10 +48,10 @@ const getResource = (pth: string) => new URL(pth, import.meta.url).href;
         </div>
         <div class="member-meta">
           <span class="last-updated">오후 2:30</span>
-          <div class="unread-count">1</div>
+          <span class="unread-count">1</span>
         </div>
-      </div>
+      </dd>
       <!--] MEMBER-ITEM -->
-    </div>
+    </dl>
   </section>
 </template>
