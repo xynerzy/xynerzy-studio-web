@@ -28,19 +28,18 @@ const getResource = (pth: string) => new URL(pth, import.meta.url).href;
         </div>
         <div class="member-meta">
           <span class="last-updated">오후 2:30</span>
-          <span class="unread-count">5</span>
+          <span class="unread-count">999</span>
         </div>
       </dd>
       <!--] MEMBER-ITEM -->
       <!--[ MEMBER-ITEM -->
+      <!-- -->
       <dd class="member-item">
         <div class="member-avatar group">
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
-          <!--
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
           <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
-          -->
         </div>
         <div class="member-info">
           <h4 class="member-name">정산방</h4>
