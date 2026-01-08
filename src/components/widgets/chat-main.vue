@@ -17,7 +17,9 @@ const emit = defineEmits();
     id="chat-main"
     v-bind="{ ...props, ...attrs }"
     >
-    <ChatMembers />
-    <ChatMessages />
+    <ChatMembers
+      />
+    <ChatMessages
+      />
   </main>
 </template>

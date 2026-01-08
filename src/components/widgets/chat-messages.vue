@@ -38,7 +38,10 @@ const getResource = (pth: string) => new URL(pth, import.meta.url).href;
               안녕하세요! 오늘 하루도 화이팅하세요. <br />
               안녕하세요! 오늘 하루도 화이팅하세요. <br />
             </p>
-            <span class="message-time">오후 2:15</span>
+            <dl class="message-meta">
+              <dd class="message-time">오후 2:30</dd>
+              <dd class="unread-count">999</dd>
+            </dl>
           </div>
         </div>
       </dd>

@@ -13,6 +13,21 @@ $hover-bg: #f1f3f5;
 
 /* for tablet or less */
 $breakpoint-mobile: 768px;
+// $breakpoint-mobile: 600px;
+:root {
+  color-scheme: light dark;
+}
+@mixin ellipsis-vertical($lines: 2) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+  /* for browser compatability */
+  text-overflow: ellipsis;
+}
+.hidden {
+  display: none;
+}
 
 html {
   font-family: 'Pretendard';
@@ -59,6 +74,7 @@ html {
                   width: 50px;
                   height: 50px;
                   /* circular border */
+                  clip-path: circle(25px at center);
                   border-radius: 50%;
                   object-fit: cover;
                   display: block;
@@ -80,11 +96,16 @@ html {
                   height: 50px;
                   display: flex;
                   flex-wrap: wrap;
-                  border: 1px solid rgba(0, 0, 0, 0.2);
+                  border: 1px solid rgba(0, 0, 0, 0.1);
                   border-radius: 50%;
+                  clip-path: circle(25px at center);
                   > img {
                     width: 20px;
                     height: 20px;
+                    margin: -1px;
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    border-radius: 50%;
+                    clip-path: circle(10px at center);
                   }
                 }
               }
@@ -120,7 +141,8 @@ html {
               > .member-meta {
                 display: flex;
                 flex-direction: column;
-                align-items: flex-end;
+                // align-items: flex-end;
+                align-items: center;
                 margin-left: 10px;
                 flex-shrink: 0;
                 .last-updated {
@@ -164,6 +186,7 @@ html {
                   height: 50px;
                   /* circular border */
                   border-radius: 50%;
+                  clip-path: circle(25px at center);
                   object-fit: cover;
                   display: block;
                 }
@@ -178,18 +201,59 @@ html {
                   color: $chat-member-color-text-main;
                 }
                 > .bubble-group {
+                  display: flex;
+                  flex-direction: row;
+                  margin-bottom: 10px;
+                  &::before {
+                    content: " ";
+                    border: 2px solid #fea;
+                    width: 10px;
+                    height: 10px;
+                    background: #fea;
+                    position: absolute;
+                    display: block;
+                    margin-left: -8px;
+                    clip-path: polygon(0 0, 100% 0%, 100% 100%);
+                  }
                   > .message-detail {
-                    background-color: #fe0;
+                    flex: 1;
+                    background-color: #fea;
                     border-radius: 0 9px 9px 9px;
                     padding: 6px 6px 6px 6px;
                     margin: 0 5px 0 0;
                     font-size: 13px;
                     color: $chat-member-color-text-sub;
-                    /* Only one line is allowed */
-                    white-space: nowrap;
-                    overflow: hidden;
-                    /* If the length is exceeded, '...' is displayed */
-                    text-overflow: ellipsis;
+                    white-space: wrap;
+                    word-break: break-all;
+                    word-wrap: break-word;
+                    max-width: 60%;
+                    @include ellipsis-vertical(4);
+                    &:hover {
+                      display: block;
+                    }
+                  }
+                  > .message-meta {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: end;
+                    color: $chat-member-color-text-sub;
+                    font-size: 11px;
+                    > .message-time {
+                      margin: 0;
+                      margin-right: 5px;
+                    }
+                    > .unread-count {
+                      margin: 0;
+                      background-color: $chat-member-color-unread;
+                      color: white;
+                      font-size: 11px;
+                      font-weight: bold;
+                      padding: 2px 8px;
+                      border-radius: 10px;
+                      min-width: 18px;
+                      text-align: center;
+                    }
                   }
                 }
               }
@@ -198,36 +262,11 @@ html {
             $avatar-size: 40px;
             $color-name: #4a4a4a;
             .message-row {
-              display: flex;
-              max-width: 85%;
-              margin-bottom: rem(12px);
-
-              // 공통 버블 그룹 (말풍선 + 시간)
-              .bubble-group {
-                display: flex;
-                align-items: flex-end;
-              }
-
-              // 상대방 메시지 특화 스타일
               &.their-message {
                 align-self: flex-start;
-                
-                .message-avatar {
-                  flex-shrink: 0;
-                  margin-right: rem(8px);
-                  
-                  img {
-                    width: rem($avatar-size);
-                    height: rem($avatar-size);
-                    border-radius: 40%; // 약간 둥근 사각형 느낌
-                    object-fit: cover;
-                  }
-                }
-
                 .message-content {
                   display: flex;
                   flex-direction: column;
-
                   .user-name {
                     font-size: rem(12px);
                     color: $color-name;
@@ -235,29 +274,24 @@ html {
                     font-weight: 600;
                   }
                 }
-
                 .message-bubble {
                   background-color: #fff;
                   border-radius: 0 rem(12px) rem(12px) rem(12px);
                 }
               }
-
-              // 내 메시지 특화 스타일
               &.my-message {
                 align-self: flex-end;
                 flex-direction: row-reverse;
-
                 .bubble-group {
-                  flex-direction: row-reverse; // 시간-말풍선 순서 반전
+                  flex-direction: row-reverse;
                 }
-
                 .message-bubble {
                   background-color: #fee500;
                   border-radius: rem(12px) 0 rem(12px) rem(12px);
                 }
               }
             }
-] */              
+] */
           }
         }
       }
@@ -291,8 +325,8 @@ html {
           > i.icon {
             display: block;
             position: relative;
-            width: 2rem;
-            height: 2rem;
+            width: 32px;
+            height: 32px;
             background-size: cover;
             background-position-x: center;
             background-position-y: center;
@@ -305,10 +339,10 @@ html {
           }
           > img.avatar {
             position: relative;
-            top: 0.4rem;
-            width: 2rem;
-            height: 2rem;
-            clip-path: circle(2rem at 1rem, 1rem);
+            top: 5px;
+            width: 32px;
+            height: 32px;
+            clip-path: circle(32px at center);
             border: 1px solid rgba(0, 0, 0, 0.2);
             border-radius: 50% 50%;
           }
@@ -336,14 +370,16 @@ html {
     > #app {
       > #chat-main {
         > #chat-members {
+          display: none;
         }
         > #chat-messages {
-          display: none;
+          // display: none;
         }
       }
       > #toolbar {
       /* Free from Top */
-      top: auto;
+      // top: auto;
+      top: calc(100dvh - 60px);
       /* Fixed at Bottom */
       bottom: 0;
       left: 0;
@@ -359,6 +395,7 @@ html {
       padding-top: 0;
       border-right-width: 0;
       border-top-width: 1px;
+      // transform: translateY(calc(env(safe-area-inset-bottom) + 0px));
       > .menu-item {
         padding: 10px;
         &.sub {
@@ -369,5 +406,19 @@ html {
         }
       } }
     }
+  }
+} }
+
+@media (prefers-color-scheme: light) {
+html {
+  > body {
+    background-color: #fff;
+  }
+} }
+@media (prefers-color-scheme: dark) {
+html {
+  > body {
+    background-color: #fff;
+    // background-color: #000;
   }
 } }
