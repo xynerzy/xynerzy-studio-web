@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue';
+import { getResource } from '@/libs/media';
+import { type MemberItem } from '@/libs/chatting';
+
 const props = defineProps({
-  members: { type: Array }
+  members: { type: Array<MemberItem> }
 });
 const attrs = computed(() => {
   const { ...itms } = useAttrs();
   return itms;
 });
+const data = ref({
+  members: computed(() => props.members)
+});
 const emit = defineEmits();
-const getResource = (pth: string) => new URL(pth, import.meta.url).href;
 </script>
 <template>
   <section
@@ -17,37 +22,45 @@ const getResource = (pth: string) => new URL(pth, import.meta.url).href;
     >
     <dl>
       <!--[ MEMBER-ITEM -->
-      <dd class="member-item">
-        <div class="member-avatar">
-          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
-          <span class="status-online"></span>
+      <dd
+        v-for="(itm, inx) in data.members"
+        :class="{
+          'member-item': true,
+        }"
+        >
+        <div
+          :class="{
+            'member-avatar': true,
+            'group': itm.members.length > 1,
+          }"
+          >
+          <img
+            v-for="(avatar, inx) in itm.members"
+            :class="{
+              'avatar': true,
+              'inactive': !(itm.active),
+            }"
+            :src="getResource(avatar)"
+            alt="username"
+            />
+          <span
+            v-if="itm.online && itm.members.length < 2"
+            class="status-online"
+            >
+          </span>
         </div>
         <div class="member-info">
-          <h4 class="member-name">홍길동</h4>
-          <p class="member-intro">안녕하세요! 오늘 하루도 화이팅하세요. 😊</p>
+          <h4 class="member-name"> {{ itm.name }} </h4>
+          <p class="member-intro"> {{ itm.intro  }} </p>
         </div>
         <div class="member-meta">
-          <span class="last-updated">오후 2:30</span>
-          <span class="unread-count">999</span>
-        </div>
-      </dd>
-      <!--] MEMBER-ITEM -->
-      <!--[ MEMBER-ITEM -->
-      <!-- -->
-      <dd class="member-item">
-        <div class="member-avatar group">
-          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
-          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
-          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
-          <img class="avatar" :src="getResource('/images/test.svg')" alt="username" />
-        </div>
-        <div class="member-info">
-          <h4 class="member-name">정산방</h4>
-          <p class="member-intro">정산합시다</p>
-        </div>
-        <div class="member-meta">
-          <span class="last-updated">오후 2:30</span>
-          <span class="unread-count">1</span>
+          <span class="last-updated"> {{ itm.updated }} </span>
+          <span
+            v-if="itm.unread"
+            class="unread-count"
+            >
+            {{ itm.unread }}
+          </span>
         </div>
       </dd>
       <!--] MEMBER-ITEM -->

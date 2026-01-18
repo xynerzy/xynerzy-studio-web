@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useAttrs, computed } from 'vue';
+import { getResource } from '@/libs/media';
 const props = defineProps();
 const attrs = computed(() => {
   const { ...itms } = useAttrs();
   return itms;
 });
-const getResource = (pth: string) => new URL(pth, import.meta.url).href;
 </script>
 <template>
   <nav
