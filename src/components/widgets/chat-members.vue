@@ -18,7 +18,7 @@ const emit = defineEmits();
 <template>
   <section
     id="chat-members"
-    v-bind="{ ...props, ...attrs }"
+    v-bind="{ ...attrs }"
     >
     <dl>
       <!--[ MEMBER-ITEM -->
