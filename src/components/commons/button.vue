@@ -8,7 +8,7 @@ const attrs = computed(() => {
 </script>
 <template>
   <button
-    v-bind="{ ...props, ...attrs }"
+    v-bind="{ ...attrs }"
     >
   </button>
 </template>

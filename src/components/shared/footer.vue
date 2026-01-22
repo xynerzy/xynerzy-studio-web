@@ -8,7 +8,7 @@ const attrs = computed(() => {
 </script>
 <template>
   <footer
-    v-bind="{ ...props, ...attrs }"
+    v-bind="{ ...attrs }"
     >
   </footer>
 </template>

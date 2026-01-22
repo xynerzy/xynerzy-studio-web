@@ -5,11 +5,11 @@
  * @Description : Crypto Utility
  * @Site        : https://github.com/xynerzy
  **/
-import cryptojs from 'crypto-js'
-import * as C from './constants'
-import log from './log'
+import cryptojs from 'crypto-js';
+import * as C from './constants';
+import log from './log';
 
-type WordArray = cryptojs.lib.WordArray
+type WordArray = cryptojs.lib.WordArray;
 /* default key store */
 const context = {
   aes: {
@@ -31,12 +31,12 @@ const context = {
     cryptor: C.UNDEFINED,
     defkey: ''
   }
-}
+};
 
-context.aes.defkey = cryptojs.enc.Utf8.parse(''.padEnd(context.aes.defbit / 8, '\0'))
-context.aes.opt.iv = cryptojs.enc.Hex.parse(''.padEnd(16, '0'))
+context.aes.defkey = cryptojs.enc.Utf8.parse(''.padEnd(context.aes.defbit / 8, '\0'));
+context.aes.opt.iv = cryptojs.enc.Hex.parse(''.padEnd(16, '0'));
 
-const NIL_ARR = cryptojs.enc.Hex.parse('00')
+const NIL_ARR = cryptojs.enc.Hex.parse('00');
 
 const crypto = {
   /* AES Module */
@@ -77,19 +77,19 @@ const crypto = {
   rsa: {
     init: async (keyval?: string, keytype?: string) => {
       if (!context.rsa.JSEncrypt) {
-        context.rsa.JSEncrypt = (await import('@/jsencrypt/lib/index')).default
-        const { parseBigInt, BigInteger } = (await import('@/jsencrypt/lib/lib/jsbn/jsbn'))
-        const { SecureRandom } = (await import('@/jsencrypt/lib/lib/jsbn/rng'))
-        const { b64tohex, hex2b64 } = (await import('@/jsencrypt/lib/lib/jsbn/base64'))
-        context.rsa.BigInteger = BigInteger
-        context.rsa.SecureRandom = SecureRandom
-        context.rsa.parseBigInt = parseBigInt
-        context.rsa.b64tohex = b64tohex
-        context.rsa.hex2b64 = hex2b64
-        const cryptor = context.rsa.cryptor = new context.rsa.JSEncrypt()
+        context.rsa.JSEncrypt = (await import('!/jsencrypt/lib/index')).default;
+        const { parseBigInt, BigInteger } = (await import('!/jsencrypt/lib/lib/jsbn/jsbn'));
+        const { SecureRandom } = (await import('!/jsencrypt/lib/lib/jsbn/rng'));
+        const { b64tohex, hex2b64 } = (await import('!/jsencrypt/lib/lib/jsbn/base64'));
+        context.rsa.BigInteger = BigInteger;
+        context.rsa.SecureRandom = SecureRandom;
+        context.rsa.parseBigInt = parseBigInt;
+        context.rsa.b64tohex = b64tohex;
+        context.rsa.hex2b64 = hex2b64;
+        const cryptor = context.rsa.cryptor = new context.rsa.JSEncrypt();
         switch (keytype) {
-        case C.PRIVATE_KEY: case C.UNDEFINED: { cryptor.setPrivateKey(keyval) } break
-        case C.PUBLIC_KEY: { cryptor.setPublicKey(keyval) } break
+        case C.PRIVATE_KEY: case C.UNDEFINED: { cryptor.setPrivateKey(keyval); } break;
+        case C.PUBLIC_KEY: { cryptor.setPublicKey(keyval); } break;
         }
       }
     },
@@ -155,7 +155,7 @@ const crypto = {
     try { ret = cryptojs.enc.Hex.parse(key) } catch (e) { log.debug('E:', e) }
     return ret
   },
-}
+};
 
 const tohex = (v: any) => {
   let ret = ''
@@ -165,14 +165,14 @@ const tohex = (v: any) => {
     ret = v.toString(16)
   }
   return ret
-}
+};
 const tobig = (v: any) => {
   let ret = v
   if (v && typeof v === 'number') {
     ret = context.rsa.parseBigInt(v.toString(16), 16)
   }
   return ret
-}
+};
 
 const pkcsunpad = (bint: any, len: any) => {
   var buf = bint.toByteArray()
@@ -194,7 +194,7 @@ const pkcsunpad = (bint: any, len: any) => {
     }
   }
   return ret
-}
+};
 
 const pkcspad = (msg: any, pos: any) => {
   /* TODO: fix for utf-8 */
@@ -232,6 +232,6 @@ const pkcspad = (msg: any, pos: any) => {
   buf[--pos] = 1
   buf[--pos] = 0
   return new context.rsa.BigInteger(buf)
-}
+};
 
-export default crypto
+export default crypto;

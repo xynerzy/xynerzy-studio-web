@@ -201,9 +201,11 @@ const api = {
   },
   /* Reassemble the URL into the correct format */
   mkuri(apicd: string) {
-    const mat: any = apicd && /^([a-z]+)([0-9a-zA-Z]+)([/].*){0,1}$/g.exec(apicd) || {}
+    // const mat: any = apicd && /^([a-z]+)([0-9a-zA-Z]+)([/].*){0,1}$/g.exec(apicd) || {}
+    const mat: any = apicd && /^([a-z]+)([0-9a-zA-Z_-]+)([/].*){0,1}$/g.exec(apicd) || {}
     if (mat && mat[1]) {
-      return `${(app.getConfig()?.api[0] || {})?.base || '/api'}/${mat[1]}/${mat[0]}`
+      // return `${(app.getConfig()?.api[0] || {})?.base || '/api'}/${mat[1]}/${mat[0]}`
+      return `${(app.getConfig()?.api[0] || {})?.base || '/api'}/${mat[0]}`
     } else {
       return apicd
     }

@@ -10,7 +10,7 @@ const attrs = computed(() => {
 <template>
   <nav
     id="toolbar"
-    v-bind="{ ...props, ...attrs }"
+    v-bind="{ ...attrs }"
     >
     <div class="menu-item">
       <img class="avatar" :src="getResource('/images/test.svg')" />
