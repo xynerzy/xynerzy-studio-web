@@ -1,4 +1,4 @@
-type MemberItem = {
+type ChatSessionItem = {
   name: string,
   intro: string,
   members: Array<string> | [],
@@ -18,6 +18,6 @@ type MessageItem = {
 };
 
 export {
-  type MemberItem,
+  type ChatSessionItem,
   type MessageItem
 };

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useAttrs } from 'vue';
-import { type MemberItem, type MessageItem } from '@/libs/chatting';
+import { type ChatSessionItem, type MessageItem } from '@/libs/chatting';
 
-import ChatMembers from '@/components/widgets/chat-members.vue';
+import ChatSessions from '@/components/widgets/chat-sessions.vue';
 import ChatMessages from '@/components/widgets/chat-messages.vue';
 import api from '@/libs/api';
 import log from '@/libs/log';
@@ -16,14 +16,14 @@ const attrs = computed(() => {
 const emit = defineEmits();
 
 const data = ref({
-  members: [] as MemberItem[],
+  chatSessions: [] as ChatSessionItem[],
   messages: [] as MessageItem[]
 });
 
 onMounted(async () => {
   {
-    const res = await api.post("member/list", {}, {});
-    data.value.members = res;
+    const res = await api.post("chat-session/list", {}, {});
+    data.value.chatSessions = res;
     log.debug("MEMBERS:", res);
   }
   {
@@ -39,8 +39,8 @@ onMounted(async () => {
     id="chat-main"
     v-bind="{ ...attrs }"
     >
-    <ChatMembers
-      :members="data.members"
+    <ChatSessions
+      :chat-sessions="data.chatSessions"
       />
     <ChatMessages
       :messages="data.messages"

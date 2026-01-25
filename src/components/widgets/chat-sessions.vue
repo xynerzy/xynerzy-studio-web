@@ -1,31 +1,31 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue';
 import { getResource } from '@/libs/media';
-import { type MemberItem } from '@/libs/chatting';
+import { type ChatSessionItem } from '@/libs/chatting';
 
 const props = defineProps({
-  members: { type: Array<MemberItem> }
+  chatSessions: { type: Array<ChatSessionItem> }
 });
 const attrs = computed(() => {
   const { ...itms } = useAttrs();
   return itms;
 });
 const data = ref({
-  members: computed(() => props.members)
+  chatSessions: computed(() => props.chatSessions)
 });
 const emit = defineEmits();
 </script>
 <template>
   <section
-    id="chat-members"
+    id="chat-sessions"
     v-bind="{ ...attrs }"
     >
     <dl>
-      <!--[ MEMBER-ITEM -->
+      <!--[ SESSION-ITEM -->
       <dd
-        v-for="(itm, inx) in data.members"
+        v-for="(itm, inx) in data.chatSessions"
         :class="{
-          'member-item': true,
+          'session-item': true,
         }"
         >
         <div
@@ -49,11 +49,11 @@ const emit = defineEmits();
             >
           </span>
         </div>
-        <div class="member-info">
-          <h4 class="member-name"> {{ itm.name }} </h4>
-          <p class="member-intro"> {{ itm.intro  }} </p>
+        <div class="chat-session-info">
+          <h4 class="chat-session-name"> {{ itm.name }} </h4>
+          <p class="chat-session-intro"> {{ itm.intro  }} </p>
         </div>
-        <div class="member-meta">
+        <div class="chat-session-meta">
           <span class="last-updated"> {{ itm.updated }} </span>
           <span
             v-if="itm.unread"
@@ -63,7 +63,7 @@ const emit = defineEmits();
           </span>
         </div>
       </dd>
-      <!--] MEMBER-ITEM -->
+      <!--] SESSION-ITEM -->
     </dl>
   </section>
 </template>

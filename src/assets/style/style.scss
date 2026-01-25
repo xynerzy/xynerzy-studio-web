@@ -49,13 +49,13 @@ html {
       > #chat-main {
         position: inherit;
         display: flex;
-        > #chat-members {
+        > #chat-sessions {
           flex: 1;
           border-right: 1px solid #f1f1f1;
           > dl {
             margin-top: 0;
             margin-bottom: 0;
-            > .member-item {
+            > .session-item {
               margin-left: 0;
               display: flex;
               align-items: start;
@@ -116,19 +116,19 @@ html {
                 }
               }
               /* Name and descriptions Area */
-              > .member-info {
+              > .chat-session-info {
                 /* It takes up the entire remaining space */
                 flex: 1;
                 /* Settings for text ellipsis operation */
                 min-width: 0;
                 
-                > .member-name {
+                > .chat-session-name {
                   margin: 0 0 4px 0;
                   font-size: 16px;
                   font-weight: 600;
                   color: $chat-member-color-text-main;
                 }
-                > .member-intro {
+                > .chat-session-intro {
                   /* Fixing text width overflow bugs using css tricks */
                   position: relative;
                   width: 100%;
@@ -144,7 +144,7 @@ html {
                 }
               }
               /* Meta information Area (Time & badge ..) */
-              > .member-meta {
+              > .chat-session-meta {
                 display: flex;
                 flex-direction: column;
                 // align-items: flex-end;
@@ -465,7 +465,7 @@ html {
     margin-bottom: 60px;
     > #app {
       > #chat-main {
-        > #chat-members {
+        > #chat-sessions {
           display: none;
         }
         > #chat-messages {
