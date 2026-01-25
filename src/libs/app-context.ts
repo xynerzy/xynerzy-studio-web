@@ -242,7 +242,9 @@ const app = {
     return uri
   },
   astate: () => appvars.astate,
-  ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate ? true : false,
+  /* FIXME: temporary code */
+  // ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate ? true : false,
+  ready: (astate: number = C.APPSTATE_READY) => true,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
   isServer: () => typeof window === 'undefined',

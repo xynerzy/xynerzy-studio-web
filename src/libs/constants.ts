@@ -103,6 +103,7 @@ export const DESCENDING = 'descending'
 
 export const BEARER = 'Bearer'
 export const AUTHORIZATION = 'Authorization'
+export const HEAD = 'head'
 export const POST = 'post'
 export const GET = 'get'
 export const PUT = 'put'

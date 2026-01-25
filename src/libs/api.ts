@@ -151,7 +151,7 @@ const api = {
       const curtime = new Date().getTime()
       if (opt?.noping) { return resolve(true) }
       if (curtime < api.nextping) { return resolve(true) }
-      const { method, headers, signal, url, abortclr } = await init(C.GET, apicd, {}, { noprogress: true })
+      const { method, headers, signal, url, abortclr } = await init(C.HEAD, apicd, {}, { noprogress: true })
       const run = () => fetch(url, { method, headers, signal, keepalive })
       const res: any = await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
       /* 다음 ping 은 10초 이후 */

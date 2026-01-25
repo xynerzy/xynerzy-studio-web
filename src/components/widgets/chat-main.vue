@@ -21,54 +21,17 @@ const data = ref({
 });
 
 onMounted(async () => {
-  const res = api.get("member-list", {}, {});
-  log.debug("CHECK:", res);
+  {
+    const res = await api.post("member/list", {}, {});
+    data.value.members = res;
+    log.debug("MEMBERS:", res);
+  }
+  {
+    const res = await api.post("message/list", {}, {});
+    data.value.messages = res;
+    log.debug("MESSAGES:", res);
+  }
 });
-
-
-// data.value.members = [
-//   {
-//     name: 'tester',
-//     intro: 'hello!',
-//     members: [
-//       '/images/test.svg'
-//     ],
-//     active: true,
-//     online: true,
-//     updated: 'PM 01:10',
-//     unread: 1
-//   },
-//   {
-//     name: 'tester-group',
-//     intro: 'work group',
-//     members: [
-//       '/images/test.svg',
-//       '/images/test.svg',
-//       '/images/test.svg',
-//       '/images/test.svg',
-//     ],
-//     active: true,
-//     online: true,
-//     updated: 'PM 01:10'
-//   }
-// ];
-// data.value.messages = [
-//   {
-//     type: 'my',
-//     content: 'hi ! whatsup!?',
-//     time: 'PM 01:10',
-//     userId: 'tester',
-//     unread: 1
-//   },
-//   {
-//     type: 'their',
-//     content: 'Nothing special. How about you?',
-//     avatar: '/images/test.svg',
-//     time: 'PM 01:10',
-//     userId: 'tester',
-//     unread: 1
-//   }
-// ];
 
 </script>
 <template>
