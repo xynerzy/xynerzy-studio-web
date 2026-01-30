@@ -1,4 +1,11 @@
-import { defineConfig, FSWatcher } from 'vite';
+/**
+ * @File        : vite.config.ts
+ * @Author      : lupfeliz@gmail.com
+ * @Since       : 2026-01-30
+ * @Description : vite config
+ * @Site        : https://github.com/xynerzy
+ **/
+import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import legacy from '@vitejs/plugin-legacy';
@@ -11,6 +18,9 @@ export default defineConfig({
       additionalModernPolyfills: [ 'regenerator-runtime/runtime' ]
     })
   ],
+  define: {
+    global: { },
+  },
   publicDir: './src/static',
   build: {
   },

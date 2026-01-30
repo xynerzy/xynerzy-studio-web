@@ -1,8 +1,17 @@
+/**
+ * @File        : style.scss
+ * @Author      : lupfeliz@gmail.com
+ * @Since       : 2026-01-30
+ * @Description : style
+ * @Site        : https://github.com/xynerzy
+ **/
+@charset "UTF-8";
 @import url(../fonts/pretendard.css);
 
 $toolbar-bg: #f8f9fa;
 $toolbar-active-color: #007bff;
 $toolbar-width: 70px;
+$toolbar-height: 60px;
 
 /* chat-member item variables */
 $chat-member-color-text-main: #2d3436;
@@ -49,6 +58,8 @@ html {
       > #chat-main {
         position: inherit;
         display: flex;
+        // height: calc(100vh);
+        height: calc(100dvh);
         > #chat-sessions {
           flex: 1;
           border-right: 1px solid #f1f1f1;
@@ -172,12 +183,16 @@ html {
         }
         > #chat-messages {
           flex: 1;
+          display: flex;
+          flex-direction: column;
           border-right: 1px solid #ccc;
           > dl.chat-container {
             margin-top: 12px;
             margin-left: 12px;
             margin-right: 12px;
             margin-bottom: 0;
+            flex: 1;
+            overflow-y: auto;
             > .message-row {
               color: #000;
               margin-left: 0;
@@ -202,6 +217,7 @@ html {
               > .message-content {
                 flex: 1;
                 min-width: 0;
+                // height: calc(100dvh - 60px - 30px);
                 > .member-name {
                   margin: 0 0 4px 0;
                   font-size: 16px;
@@ -210,6 +226,7 @@ html {
                 }
                 > .bubble-group {
                   display: flex;
+                  position: relative;
                   flex-direction: row;
                   margin-bottom: 10px;
                   > .message-detail {
@@ -354,40 +371,29 @@ html {
                 }
               }
             }
-/* [
-            $avatar-size: 40px;
-            $color-name: #4a4a4a;
-            .message-row {
-              &.their-message {
-                align-self: flex-start;
-                .message-content {
-                  display: flex;
-                  flex-direction: column;
-                  .user-name {
-                    font-size: rem(12px);
-                    color: $color-name;
-                    margin-bottom: rem(4px);
-                    font-weight: 600;
-                  }
-                }
-                .message-bubble {
-                  background-color: #fff;
-                  border-radius: 0 rem(12px) rem(12px) rem(12px);
-                }
-              }
-              &.my-message {
-                align-self: flex-end;
-                flex-direction: row-reverse;
-                .bubble-group {
-                  flex-direction: row-reverse;
-                }
-                .message-bubble {
-                  background-color: #fee500;
-                  border-radius: rem(12px) 0 rem(12px) rem(12px);
-                }
-              }
+          }
+          > .chat-input-wrap {
+            height: 2rem;
+            display: flex;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin: 5px 10px;
+            padding: 5px;
+            > input {
+              background: #fff;
+              border: none;
+              margin-right: 5px;
+              border-radius: 5px;
+              color: #333;
+              height: 25px;
+              flex: auto;
             }
-] */
+            > button {
+              width: 30px;
+              background: #fff;
+              border: 1px solid #ccc;
+              border-radius: 5px;
+            }
           }
         }
       }
@@ -462,27 +468,33 @@ html {
   > body {
     margin-left: 0;
     /* For Mobile. Bottom margin */
-    margin-bottom: 60px;
+    margin-bottom: $toolbar-height;
     > #app {
       > #chat-main {
+        // height: calc(100vh - $toolbar-height);
+        height: calc(100dvh - $toolbar-height);
         > #chat-sessions {
           display: none;
         }
         > #chat-messages {
           // display: none;
+          > dl.chat-container {
+            // height: calc(100dvh - 2rem - $toolbar-height);
+          }
         }
       }
       > #toolbar {
       /* Free from Top */
       // top: auto;
-      top: calc(100dvh - 60px);
+      // top: calc(100vh - $toolbar-height);
+      top: calc(100dvh - $toolbar-height);
       /* Fixed at Bottom */
       bottom: 0;
       left: 0;
       right: 0;
       /* Whole width */
       width: 100%;
-      height: 60px;
+      height: $toolbar-height;
       /* Horizontal */
       flex-direction: row;
       /* Distribute item spacing */

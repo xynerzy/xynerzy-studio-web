@@ -6,10 +6,10 @@
  * @Site        : https://github.com/xynerzy
  **/
 
-import { reactive } from 'vue'
+import { reactive } from 'vue';
 import { dialogContext } from '@/libs/dialog-context';
-import * as C from '@/libs/constants'
-import log from '@/libs/log'
+import * as C from '@/libs/constants';
+import log from '@/libs/log';
 
 const ctx = reactive({
   modal: {
@@ -24,7 +24,7 @@ const ctx = reactive({
     current: {} as any,
     queue: [] as any[]
   }
-})
+});
 
 const dialog = {
   alert: (msg: string) => new Promise<boolean>((resolve) => {
@@ -49,7 +49,7 @@ const dialog = {
       resolve
     })
   }),
-}
+};
 
-export default dialog
-export { ctx as dialogContext }
+export default dialog;
+export { ctx as dialogContext };

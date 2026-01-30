@@ -1,3 +1,11 @@
+/**
+ * @File        : chatting.ts
+ * @Author      : lupfeliz@gmail.com
+ * @Since       : 2026-01-30
+ * @Description : Chatting Entity Model
+ * @Site        : https://github.com/xynerzy
+ **/
+
 type ChatSessionItem = {
   name: string,
   intro: string,

@@ -1,3 +1,10 @@
+<!--
+@File        : chat-sessions.vue
+@Author      : lupfeliz@gmail.com
+@Since       : 2026-01-29
+@Description : Chatting Session view
+@Site        : https://github.com/xynerzy
+-->
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue';
 import { getResource } from '@/libs/media';

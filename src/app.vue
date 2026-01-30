@@ -1,3 +1,10 @@
+<!--
+@File        : app.vue
+@Author      : lupfeliz@gmail.com
+@Since       : 2026-01-29
+@Description : entry point
+@Site        : https://github.com/xynerzy
+-->
 <script setup lang="ts">
 import Header from '@/components/shared/header.vue';
 import Footer from '@/components/shared/footer.vue';

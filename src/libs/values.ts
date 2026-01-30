@@ -5,666 +5,665 @@
  * @Description : Collection of various data utilities
  * @Site        : https://github.com/xynerzy
  **/
-import * as C from './constants'
-import log from './log'
+import * as C from './constants';
+import log from './log';
 
 type PutAllOptType = {
   deep?: boolean
   root?: any
-}
+};
 
 const values = {
   clone<T>(v: T) {
-    let ret:T = C.UNDEFINED
+    let ret:T = C.UNDEFINED;
     try {
-      ret = JSON.parse(JSON.stringify(v))
-    } catch(e) { log.debug('E:', e) }
-    return ret
+      ret = JSON.parse(JSON.stringify(v));
+    } catch(e) { log.debug('E:', e); }
+    return ret;
   },
   toJSON(obj: any) {
-    if (!obj) { return obj }
-    let ret: any = { }
+    if (!obj) { return obj; }
+    let ret: any = { };
     if (typeof(obj) === C.STRING) {
       try {
-        ret = JSON.parse(obj)
+        ret = JSON.parse(obj);
       } catch (e) {
         /* JS식 JSON인 경우. */
         try {
-          ret = JSON.parse(values.toString(eval(`(${obj})`)))
+          ret = JSON.parse(values.toString(eval(`(${obj})`)));
         } catch (ignore) { }
       }
     } else if (obj instanceof Array) {
-      ret = JSON.parse(values.toString(obj))
+      ret = JSON.parse(values.toString(obj));
     } else if (typeof(obj) === C.OBJECT) {
-      let tmp: any = {}
+      let tmp: any = {};
       for (const k in obj) {
-        let v = obj[k]
+        let v = obj[k];
         if (v instanceof Function) {
-          continue
+          continue;
         } else if (v === null) {
-          tmp[k] = null
+          tmp[k] = null;
         } else if (values.find(typeof (v), [C.STRING, C.NUMBER, C.BOOLEAN]) >= 0) {
-          tmp[k] = v
+          tmp[k] = v;
         } else {
-          tmp[k] = values.toJSON(v)
+          tmp[k] = values.toJSON(v);
           if (Object.keys(tmp[k]).length == 0) {
-            tmp[k] = ''
+            tmp[k] = '';
           }
         }
       }
-      ret = JSON.parse(values.toString(tmp))
+      ret = JSON.parse(values.toString(tmp));
     }
-    return ret
+    return ret;
   },
   /* remove circler reference object */
   toString(val: any, replacer?: any, spc?: number) {
-    let cache: any[] = []
+    let cache: any[] = [];
     const ret = JSON.stringify(val, (k, v) => {
       if (replacer && replacer instanceof Function) {
-        v = replacer(k, v)
+        v = replacer(k, v);
       }
       if (typeof v === C.OBJECT && v) {
         if (cache.includes(v)) {
-          return undefined
+          return undefined;
         } else {
-          cache.push(v)
-          return v
+          cache.push(v);
+          return v;
         }
       }
-      return v
-    }, spc)
-    values.clear(cache)
-    return ret
+      return v;
+    }, spc);
+    values.clear(cache);
+    return ret;
   },
   /* Copy all items in the Array. */
   pushAll<T extends Array<any>>(array: T, source: Array<any>, tpos?: number, spos? : number) {
-    let target: any[] = array
-    if (target == null) { return target }
-    if (source == null) { return target }
-    if (target === source) { return target }
-    if (tpos === undefined) { tpos = target.length }
-    if (spos === undefined) { spos = 0 }
+    let target: any[] = array;
+    if (target == null) { return target; }
+    if (source == null) { return target; }
+    if (target === source) { return target; }
+    if (tpos === undefined) { tpos = target.length; }
+    if (spos === undefined) { spos = 0; }
     for (let inx = 0; inx < (source.length - spos); inx++) {
-      target.splice(tpos + inx, 0, source[spos + inx])
+      target.splice(tpos + inx, 0, source[spos + inx]);
     }
-    return target
+    return target;
   },
   /* All properties of the source object are passed to the target object (the first argument is target). If the deep option is given, it is called recursively for each element. */
   putAll<T>(_target: T, source: any, opt: PutAllOptType = C.UNDEFINED) {
-    let target: any = _target
-    if (target == null || source == null || target === source ) { return target }
-    if (!opt) { opt = { root: target } }
+    let target: any = _target;
+    if (target == null || source == null || target === source ) { return target; }
+    if (!opt) { opt = { root: target } };
     for (const k in source) {
-      const titem = target[k]
-      const sitem = source[k]
+      const titem = target[k];
+      const sitem = source[k];
       if (titem !== undefined && titem !== null) {
         if (typeof (titem) === C.STRING) {
-          target[k] = source[k]
+          target[k] = source[k];
         } else if ((opt?.deep) && titem instanceof Array && sitem instanceof Array) {
-          values.putAll(titem, sitem, opt)
+          values.putAll(titem, sitem, opt);
         } else if ((opt?.deep) && typeof(titem) === C.OBJECT && typeof(sitem) === C.OBJECT) {
-          values.putAll(titem, sitem, opt)
+          values.putAll(titem, sitem, opt);
         } else {
           /* If the types are different, they will be replaced unconditionally. */
-          target[k] = source[k]
+          target[k] = source[k];
         }
       } else {
-        target[k] = source[k]
+        target[k] = source[k];
       }
     }
-    return target
+    return target;
   },
   /* Creates an object that copies all elements except those listed in target. */
   copyExclude<T>(target: T, excludes: any[] = []) {
-    let ret: any = { }
+    let ret: any = { };
     const { ...itms } = target;
-    const keys = Object.keys(target as any)
+    const keys = Object.keys(target as any);
     for (const key of keys) {
-      if (excludes.indexOf(key) !== -1) { continue }
-      ret[key] = (target as any)[key]
+      if (excludes.indexOf(key) !== -1) { continue; }
+      ret[key] = (target as any)[key];
     }
-    return ret as T
+    return ret as T;
   },
   /* Copy only the contents that have the key value of the target object. */
   copyExists(target: any, source: any, keys?: string[]) {
-    if (target == null) { return }
-    if (source == null) { return  }
+    if (target == null) { return; }
+    if (source == null) { return; }
     if (keys !== undefined) {
       for (const k of keys) {
-        target[k] = source[k]
+        target[k] = source[k];
       }
     } else {
       for (const k in target) {
-        target[k] = source[k]
+        target[k] = source[k];
       }
     }
-    return target
+    return target;
   },
   /* Merge multiple arrays into a new array */
   merge(...params: any[]) {
-    let ret: any = undefined
+    let ret: any = undefined;
     for (const item of params) {
       if (item instanceof Array) {
-        if (ret === undefined) { ret = [ ] }
-        values.pushAll(ret, item)
+        if (ret === undefined) { ret = [ ]; }
+        values.pushAll(ret, item);
       } else {
-        if (ret === undefined) { ret = { } }
-        values.putAll(ret, item)
+        if (ret === undefined) { ret = { }; }
+        values.putAll(ret, item);
       }
     }
-    return ret
+    return ret;
   },
 
   equals(target: any, source: any) {
-    let ret = false
+    let ret = false;
     if (target instanceof Array) {
-      if (!(source instanceof Array)) { return false }
-      if (target.length != source.length) { return false }
-      ret = true
+      if (!(source instanceof Array)) { return false; }
+      if (target.length != source.length) { return false; }
+      ret = true;
       for (let inx = 0; inx < target.length; inx++) {
-        if (target[inx] !== source[inx]) { return false }
+        if (target[inx] !== source[inx]) { return false; }
       }
     } else if (typeof target === C.OBJECT) {
-      if (Object.keys(target).length != Object.keys(source).length) { return false }
-      ret = true
+      if (Object.keys(target).length != Object.keys(source).length) { return false; }
+      ret = true;
       for (const k in target) {
-        if (target[k] !== source[k]) { return false }
+        if (target[k] !== source[k]) { return false; }
       }
     } else {
-      ret = target == source
+      ret = target == source;
     }
-    return ret
+    return ret;
   },
 
   equalsIgnoreCase(v1: string, v2: string) {
-    let ret = false
-    if (typeof v1 != C.STRING) { return ret }
-    if (typeof v2 != C.STRING) { return ret }
-    if (!v1 && !v2) { return true }
-    if (!v1 || !v2) { return ret }
-    v1 = v1.toLowerCase()
-    v2 = v2.toLowerCase()
-    ret = v1 == v2
-    return ret
+    let ret = false;
+    if (typeof v1 != C.STRING) { return ret; }
+    if (typeof v2 != C.STRING) { return ret; }
+    if (!v1 && !v2) { return true; }
+    if (!v1 || !v2) { return ret; }
+    v1 = v1.toLowerCase();
+    v2 = v2.toLowerCase();
+    ret = v1 == v2;
+    return ret;
   },
 
   remove(arr: any[], v: any) {
-    if (arr === undefined) { return }
-    const inx = arr.indexOf(v)
-    if (inx !== -1) { arr.splice(inx, 1) }
+    if (arr === undefined) { return; }
+    const inx = arr.indexOf(v);
+    if (inx !== -1) { arr.splice(inx, 1); }
   },
 
   /* Change JSON key values. */
   replaceKey(obj: any, k1: any, k2: string) {
-    if (!obj) { return obj }
-    if (typeof(obj) !== 'object') { return obj }
+    if (!obj) { return obj; }
+    if (typeof(obj) !== 'object') { return obj; }
     if (k1 instanceof RegExp) {
       /* 정규식치환 */
-      log.trace('REPLACE KEY BY REGEX', k1, k2)
+      log.trace('REPLACE KEY BY REGEX', k1, k2);
       for (const k in obj) {
         if (k1.test(k)) {
-          obj[k.replace(k1, k2)] = obj[k]
-          delete obj[k]
+          obj[k.replace(k1, k2)] = obj[k];
+          delete obj[k];
         }
       }
     } else if (typeof(k1) === 'string') {
       /* replace string */
       log.trace('REPLACE KEY BY STRING', k1, k2)
       for (const k in obj) {
-        let pos = undefined
+        let pos = undefined;
         if ((pos = k.indexOf(k1)) != -1) {
-          obj[k.replace(k1, k2)] = obj[k]
-          delete obj[k]
+          obj[k.replace(k1, k2)] = obj[k];
+          delete obj[k];
         }
-        // log.debug('POS:', pos, k1, k2, k, k.replace(k1, k2))
+        // log.debug('POS:', pos, k1, k2, k, k.replace(k1, k2));
       }
     } else {
       /* If it is an object, it is not replaced. (TODO:We will think about it in a different direction later.) */
     }
-    log.trace('REPLACED:', obj)
-    return obj
+    log.trace('REPLACED:', obj);
+    return obj;
   },
   /* Delete all elements inside the target object */
   clear<T>(target: T) {
     if (target instanceof Array) {
-      target.splice(0, target.length)
+      target.splice(0, target.length);
     } else if (target) {
       for (const k in target) {
-        const v = target[k]
+        const v = target[k];
         if (v instanceof Array) {
-          values.clear(v)
+          values.clear(v);
         } else if (typeof v === C.OBJECT) {
-          values.clear(v)
+          values.clear(v);
         } else {
-          delete target[k]
+          delete target[k];
         }
       }
     }
-    return target
+    return target;
   },
   /* Generate a random number between the minimum (min) and maximum (max) values. If the minimum value is not entered, it is automatically set to 0. */
   getRandom(max: number, min: number = C.UNDEFINED) {
-    if (min == C.UNDEFINED) { min = 0 }
-    if (max < 0) { max = max * -1 }
-    const ret = min + Math.floor(Math.random() * max)
-    return ret
+    if (min == C.UNDEFINED) { min = 0; }
+    if (max < 0) { max = max * -1; }
+    const ret = min + Math.floor(Math.random() * max);
+    return ret;
   },
   /* single random character */
   randomChar(c = 'a', n = 26) {
-    return String.fromCharCode(Number(c.charCodeAt(0)) + values.getRandom(n))
+    return String.fromCharCode(Number(c.charCodeAt(0)) + values.getRandom(n));
   },
   /* generate random string. it can generate three types of strings (number / alpha / alphanum) */
   randomStr (length: number, type: 'number' | 'alpha' | 'alphanum' = C.UNDEFINED) {
-    let ret = ''
+    let ret = '';
     switch (type) {
     case undefined:
     /* number */
     case 'number': {
       for (let inx = 0; inx < length; inx++) {
-        ret += String(values.getRandom(10))
+        ret += String(values.getRandom(10));
       }
-    } break
+    } break;
     /* character */
     case 'alpha': {
       for (let inx = 0; inx < length; inx++) {
         switch(values.getRandom(2)) {
-        case 0: /* 소문자 */ { ret += values.randomChar('a', 26) } break
-        case 1: /* 대문자 */ { ret += values.randomChar('A', 26) } break
+        case 0: /* 소문자 */ { ret += values.randomChar('a', 26) } break;
+        case 1: /* 대문자 */ { ret += values.randomChar('A', 26) } break;
         }
       }
-    } break
+    } break;
     /* character and number */
     case 'alphanum': {
       for (let inx = 0; inx < length; inx++) {
         switch(values.getRandom(3)) {
-        case 0: /* 숫자   */ { ret += String(values.getRandom(10)) } break
-        case 1: /* 소문자 */ { ret += values.randomChar('a', 26) } break
-        case 2: /* 대문자 */ { ret += values.randomChar('A', 26) } break
+        case 0: /* 숫자   */ { ret += String(values.getRandom(10)) } break;
+        case 1: /* 소문자 */ { ret += values.randomChar('a', 26) } break;
+        case 2: /* 대문자 */ { ret += values.randomChar('A', 26) } break;
         }
       }
-      break
+      break;
     } }
-    return ret
+    return ret;
   },
   delete(v: any, key: any) {
-    if (!v) { return v }
-    if (!key) { return v }
+    if (!v) { return v; }
+    if (!key) { return v; }
     if (typeof key === C.STRING) {
-      delete v[key]
+      delete v[key];
     } else if (key instanceof Array) {
-      for (const k of key) { delete v[k] }
+      for (const k of key) { delete v[k]; }
     } else {
-      for (const k in key) { delete v[k] }
+      for (const k in key) { delete v[k]; }
     }
-    return v
+    return v;
   },
   min(array: Array<any>) {
-    let ret = undefined
+    let ret = undefined;
     try {
       for (const v of array) {
-        if (ret === undefined) { ret = v; continue }
-        if (v < ret) { ret = v }
+        if (ret === undefined) { ret = v; continue; }
+        if (v < ret) { ret = v; }
       }
     } catch (ignore) { }
-    return ret
+    return ret;
   },
   max(array: Array<any>) {
-    let ret = undefined
+    let ret = undefined;
     try {
       for (const v of array) {
-        if (ret === undefined) { ret = v; continue }
-        if (v > ret) { ret = v }
+        if (ret === undefined) { ret = v; continue; }
+        if (v > ret) { ret = v; }
       }
     } catch (ignore) { }
-    return ret
+    return ret;
   },
   near(search: number | string, list: number[] | string[], minv?: number, maxv?: number) {
-    let ret = undefined
-    let dif = Number.MAX_VALUE
-    if (!list || !list.length) { return ret }
-    const v1 = Number(search)
-    if (isNaN(v1)) { return ret }
+    let ret = undefined;
+    let dif = Number.MAX_VALUE;
+    if (!list || !list.length) { return ret; }
+    const v1 = Number(search);
+    if (isNaN(v1)) { return ret; }
     for (let inx = 0; inx < list.length; inx++) {
-      const v2 = Number(list[inx])
-      if (isNaN(v2)) { continue }
-      if (minv !== undefined && !isNaN(minv) && v2 < minv) { continue }
-      if (maxv !== undefined && !isNaN(maxv) && v2 > maxv) { continue }
-      const cif = Math.abs(v1 - v2)
+      const v2 = Number(list[inx]);
+      if (isNaN(v2)) { continue; }
+      if (minv !== undefined && !isNaN(minv) && v2 < minv) { continue; }
+      if (maxv !== undefined && !isNaN(maxv) && v2 > maxv) { continue; }
+      const cif = Math.abs(v1 - v2);
       if (cif < dif) {
-        dif = cif
-        ret = list[inx]
+        dif = cif;
+        ret = list[inx];
       }
     }
-    return ret
+    return ret;
   },
   find(search: ((e: any) => boolean) | Array<any> | any, list: any[]) {
-    let ret: number = -1
-    if (!list || !list.length) { return ret }
+    let ret: number = -1;
+    if (!list || !list.length) { return ret; }
     FIND_LOOP:
     for (let inx = 0; inx < list.length; inx++) {
-      let item = list[inx]
+      let item = list[inx];
       if (search instanceof Function) {
         try {
           if (search(item)) {
-            ret = inx
-            break FIND_LOOP
+            ret = inx;
+            break FIND_LOOP;
           }
         } catch (e) { }
       } else if (search instanceof Array) {
         for (let match of search) {
           if (item === match) {
-            ret = inx
-            break FIND_LOOP
+            ret = inx;
+            break FIND_LOOP;
           }
         }
       } else {
         if (item === search) {
-          ret = inx
-          break FIND_LOOP
+          ret = inx;
+          break FIND_LOOP;
         }
       }
     }
-    return ret
+    return ret;
   },
   sort(arr: any[], ...keys: any[]) {
-    if (!arr) { return arr }
-    if (!keys) { return arr }
+    if (!arr) { return arr; }
+    if (!keys) { return arr; }
     arr.sort((a: any, b: any) => {
       for (const itm of keys) {
         if (typeof itm === C.STRING) {
-          const key = itm
-          if (a[key] == b[key]) { continue }
-          else if (a[key] > b[key]) { return 1 }
-          else if (a[key] < b[key]) { return -1 }
+          const key = itm;
+          if (a[key] == b[key]) { continue; }
+          else if (a[key] > b[key]) { return 1; }
+          else if (a[key] < b[key]) { return -1; }
         } else {
-          const key = itm.key
-          const sig = itm.odr === C.DESCENDING ? -1 : 1
-          if (a[key] == b[key]) { continue }
-          else if (a[key] > b[key]) { return 1 * sig }
-          else if (a[key] < b[key]) { return -1 * sig }
+          const key = itm.key;
+          const sig = itm.odr === C.DESCENDING ? -1 : 1;
+          if (a[key] == b[key]) { continue; }
+          else if (a[key] > b[key]) { return 1 * sig; }
+          else if (a[key] < b[key]) { return -1 * sig; }
         }
       }
-      return 0
+      return 0;
     })
-    return arr
+    return arr;
   },
   hierarchy<T extends Array<any>>(list: T, idKey: string, parentKey: string, subListKey: string, sortKey?: string, extmap?: any) {
-    const ret: T = [ ] as any as T
-    const map: any = extmap || { }
-    if (!list) { return ret }
-    const olist = values.clone(list)
+    const ret: T = [ ] as any as T;
+    const map: any = extmap || { };
+    if (!list) { return ret; }
+    const olist = values.clone(list);
     /* 1st LOOP. create map  */
     for (const item of olist) {
-      const cid = item[idKey]
-      map[cid] = item
+      const cid = item[idKey];
+      map[cid] = item;
     }
     /* 2nd LOOP find parent and set */
     for (const item of olist) {
-      const pid = item[parentKey]
+      const pid = item[parentKey];
       if (map[pid]) {
-        const parent = map[pid]
+        const parent = map[pid];
         if (!parent[subListKey]) {
-          parent[subListKey] = [ ]
+          parent[subListKey] = [ ];
         }
-        parent[subListKey].push(item)
+        parent[subListKey].push(item);
       } else {
         /* If there is no parent item, it becomes the root item. */
-        ret.push(item)
+        ret.push(item);
       }
     }
     /* sort */
     if (sortKey !== undefined) {
       const doSort = (slist: any[], depth: number) => {
-        slist.sort((a, b) => a[sortKey] - b[sortKey])
+        slist.sort((a, b) => a[sortKey] - b[sortKey]);
         for (const item of slist) {
-          const subList = item[subListKey]
+          const subList = item[subListKey];
           if (subList && subList.length > 0) {
-            log.trace('SUBLIST:', subList)
-            doSort(subList, depth + 1)
+            log.trace('SUBLIST:', subList);
+            doSort(subList, depth + 1);
           }
         }
       }
-      doSort(ret, 0)
+      doSort(ret, 0);
     }
-    return ret
+    return ret;
   },
   strreduce(v: string, len: number) {
-    let ret = v || ''
-    if (!v) { return ret }
-    if (!len) { return ret }
-    if (ret.length <= len) { return ret }
-    ret = `${String(ret).substring(0, len)}...`
-    return ret
+    let ret = v || '';
+    if (!v) { return ret; }
+    if (!len) { return ret; }
+    if (ret.length <= len) { return ret; }
+    ret = `${String(ret).substring(0, len)}...`;
+    return ret;
   },
   item(a: any[] | undefined, i: number, v?: any) {
     if (a && i !== undefined && i >= 0 && a[i]) {
-      if (v) { a[i] = v }
-      return a[i]
+      if (v) { a[i] = v };
+      return a[i];
     }
-    return v
+    return v;
   },
   concat(delim: string, nth: number, ...arg: any[]) {
-    const list: any[] = []
-    LOOP:
-    for(let inx = 0; inx < arg.length; inx++) {
-      if (!arg[inx]) { continue }
-      const arr = String(arg[inx] || '').split(delim)
+    const list: any[] = [];
+    LOOP: for(let inx = 0; inx < arg.length; inx++) {
+      if (!arg[inx]) { continue LOOP; }
+      const arr = String(arg[inx] || '').split(delim);
       for (const itm of arr) {
-        if (itm !== null && itm !== undefined) { list.push(itm) }
+        if (itm !== null && itm !== undefined) { list.push(itm); }
         if (nth && list.length >= nth) {
-          break LOOP
+          break LOOP;
         }
       }
     }
-    let ret = ''
+    let ret = '';
     for (const itm of list) {
-      if (ret) { ret = `${ret}${delim}` }
-      if (itm !== null && itm !== undefined) { ret = `${ret}${itm}` }
+      if (ret) { ret = `${ret}${delim}`; }
+      if (itm !== null && itm !== undefined) { ret = `${ret}${itm}`; }
     }
     if (ret && delim) {
-      ret = ret.replace(new RegExp(`^[${delim}]+`, 'g'), '')
-      ret = ret.replace(new RegExp(`[${delim}]+$`, 'g'), '')
-      ret = ret.trim()
+      ret = ret.replace(new RegExp(`^[${delim}]+`, 'g'), '');
+      ret = ret.replace(new RegExp(`[${delim}]+$`, 'g'), '');
+      ret = ret.trim();
     }
-    return ret
+    return ret;
   },
   val(o: any, k?: string, v?: any) {
-    let r = o
+    let r = o;
     if (o && k !== undefined && o[k]) {
-      if (v) { o[k] = v }
-      r = o[k]
+      if (v) { o[k] = v; }
+      r = o[k];
     }
-    return (r instanceof Function) ? r() : r
+    return (r instanceof Function) ? r() : r;
   },
   nval(o: any, def?: any) {
-    if (!def) { def = undefined }
+    if (!def) { def = undefined; }
     switch (o) {
     case null:
     case undefined:
-      o = def
-      break
-    default: break
+      o = def;
+      break;
+    default: break;
     }
-    return o
+    return o;
   },
   trim(value: any) {
-    if (!value) { return value }
+    if (!value) { return value; }
     for (const k in value) {
-      const v = value[k]
-      if (!v) { continue }
+      const v = value[k];
+      if (!v) { continue; }
       if (typeof v === C.STRING) {
-        value[k] = String(v).trim()
+        value[k] = String(v).trim();
       } else {
-        value[k] = values.trim(v)
+        value[k] = values.trim(v);
       }
     }
-    return value
+    return value;
   },
   num(v: any, d?: number) {
-    let ret: number = d as any as number
+    let ret: number = d as any as number;
     if (v && !isNaN(v = Number(v))) {
-      ret = v
+      ret = v;
     }
-    return ret
+    return ret;
   },
   lpad(v: string | number, len: number, pad: string) {
     if (pad.length > len) {
-      return v
+      return v;
     }
-    v = String(v)
-    pad = String(pad)
-    while (v.length < len) { v = pad + v }
-    v = v.length >= len ? v.substring(0, len) : v
-    return v
+    v = String(v);
+    pad = String(pad);
+    while (v.length < len) { v = pad + v; }
+    v = v.length >= len ? v.substring(0, len) : v;
+    return v;
   },
   rpad(v: string, len: number, pad: string) {
     if (pad.length > len) {
-      return v + ''
+      return v + '';
     }
-    v = String(v)
-    pad = String(pad)
-    while (v.length < len) { v += pad }
-    v = v.length >= len ? v.substring(0, len) : v
-    return v
+    v = String(v);
+    pad = String(pad);
+    while (v.length < len) { v += pad; }
+    v = v.length >= len ? v.substring(0, len) : v;
+    return v;
   },
   removeByKey<T>(obj: T, ptn: string[] | RegExp[], ctx?: any) {
-    let ret: any = obj
-    let ptns: RegExp[] = ptn as RegExp[]
-    if (!obj) { return ret }
-    if (!ctx) { ctx = { } }
+    let ret: any = obj;
+    let ptns: RegExp[] = ptn as RegExp[];
+    if (!obj) { return ret; }
+    if (!ctx) { ctx = { }; }
     if (!ctx.regexParsed) {
-      ctx.regexParsed = true
+      ctx.regexParsed = true;
       for (let inx = 0; inx < ptn.length; inx++) {
-        let itm = ptn[inx]
-        let regex: RegExp
+        let itm = ptn[inx];
+        let regex: RegExp;
         if (typeof itm === C.STRING) {
-          regex = RegExp(`${itm}`)
+          regex = RegExp(`${itm}`);
         } else {
-          regex = itm as RegExp
+          regex = itm as RegExp;
         }
-        ptns[inx] = regex
+        ptns[inx] = regex;
       }
     }
-    let prntkey = ctx.prntkey || ''
+    let prntkey = ctx.prntkey || '';
     if (ret instanceof Array) {
       for (let inx = 0; inx < ret.length; inx++) {
-        ctx.prntkey = `${prntkey}${prntkey ? '.' : ''}${inx}`
-        let pass = true
+        ctx.prntkey = `${prntkey}${prntkey ? '.' : ''}${inx}`;
+        let pass = true;
         for (const regex of ptns) {
-          // log.debug('CHECK:', ctx.prntkey, regex.test(ctx.prntkey))
-          if (regex.test(ctx.prntkey)) {
-            pass = false
-            break
+          // log.debug('CHECK:', ctx.prntkey, regex.test(ctx.prntkey));
+          if (regex.test(ctx.prntkey)) {;
+            pass = false;
+            break;
           }
         }
         if (!pass) {
-          ret[inx] = undefined
-          ret.splice(inx, 1)
-          inx--
+          ret[inx] = undefined;
+          ret.splice(inx, 1);
+          inx--;
         } else {
           ret[inx] = values.removeByKey(ret[inx], ptns, ctx);
         }
       }
     } else if (ret instanceof Object) {
       for (const k in ret) {
-        ctx.prntkey = `${prntkey}${prntkey ? '.' : ''}${k}`
-        let pass = true
+        ctx.prntkey = `${prntkey}${prntkey ? '.' : ''}${k}`;
+        let pass = true;
         for (const regex of ptns) {
-          // log.debug('CHECK:', ctx.prntkey, regex.test(ctx.prntkey))
+          // log.debug('CHECK:', ctx.prntkey, regex.test(ctx.prntkey));
           if (regex.test(ctx.prntkey)) {
-            pass = false
-            break
+            pass = false;
+            break;
           }
         }
         if (!pass) {
-          ret[k] = undefined
-          delete ret[k]
+          ret[k] = undefined;
+          delete ret[k];
         } else {
-          ret[k] = values.removeByKey(ret[k], ptns, ctx)
+          ret[k] = values.removeByKey(ret[k], ptns, ctx);
         }
       }
     }
-    return ret as T
+    return ret as T;
   },
   // encodeB64(v: any) {
-  //   let ret: string = ''
-  //   ret = v.toString(C.BASE64)
-  //   return ret
+  //   let ret: string = '';
+  //   ret = v.toString(C.BASE64);
+  //   return ret;
   // },
   // decodeB64(v: string) {
-  //   return Uint8Array.from(atob(v.replace(/^data[^,]+,/, '')), v => v.charCodeAt(0))
+  //   return Uint8Array.from(atob(v.replace(/^data[^,]+,/, '')), v => v.charCodeAt(0));
   // },
   pathvars(uri: string, path: string) {
-    const PTN1 = /\[([a-zA-Z0-9_$-]+)\]/g
-    let ret: any = {}
-    let o: any
-    if (!uri || !path) { return ret }
-    uri = uri.split(/[?]/g)[0]
-    const moduri = uri.split(/[/]/g)
-    const modpath = path.split(/[/]/g)
-    log.trace('PATHVARS:', moduri.length, modpath.length)
-    if (moduri.length != modpath.length) { return ret }
+    const PTN1 = /\[([a-zA-Z0-9_$-]+)\]/g;
+    let ret: any = {};
+    let o: any;
+    if (!uri || !path) { return ret; }
+    uri = uri.split(/[?]/g)[0];
+    const moduri = uri.split(/[/]/g);
+    const modpath = path.split(/[/]/g);
+    log.trace('PATHVARS:', moduri.length, modpath.length);
+    if (moduri.length != modpath.length) { return ret; }
     for (let inx = 0; inx < moduri.length; inx++) {
-      let itm1 = moduri[inx]
-      let itm2 = modpath[inx]
-      if (!itm1 || !itm2) { continue }
-      log.trace('ITM:', itm1, itm2)
+      let itm1 = moduri[inx];
+      let itm2 = modpath[inx];
+      if (!itm1 || !itm2) { continue; }
+      log.trace('ITM:', itm1, itm2);
       if (!!(o = PTN1.exec(itm2))) {
-        log.trace(`PATH-VARS[${o[1]}]=${itm1}`)
-        ret[o[1]] = itm1
+        log.trace(`PATH-VARS[${o[1]}]=${itm1}`);
+        ret[o[1]] = itm1;
       }
     }
-    return ret
+    return ret;
   },
   matcher(v: any, def: any, ...arg: any[]) {
-    let ret = C.UNDEFINED
-    let defval = C.UNDEFINED
-    let vlst = v
-    if (!arg) { return ret }
-    if (!(vlst instanceof Array)) { vlst = [vlst] }
+    let ret = C.UNDEFINED;
+    let defval = C.UNDEFINED;
+    let vlst = v;
+    if (!arg) { return ret; }
+    if (!(vlst instanceof Array)) { vlst = [vlst]; }
     for (let inx = 0; inx < arg.length; inx += 2) {
-      let alst = arg[inx]
-      if (!(alst instanceof Array)) { alst = [alst] }
+      let alst = arg[inx];
+      if (!(alst instanceof Array)) { alst = [alst]; }
       for (const aitm of alst) {
         for (const vitm of vlst) {
           if (vitm === aitm) {
-            ret = arg[inx + 1]
-            break
+            ret = arg[inx + 1];
+            break;
           }
-          if (aitm === def) { defval = arg[inx + 1] }
+          if (aitm === def) { defval = arg[inx + 1]; }
         }
       }
     }
-    if (ret === C.UNDEFINED) { ret = defval }
-    return ret
+    if (ret === C.UNDEFINED) { ret = defval; }
+    return ret;
   },
   /* Used when copying a ref object in React (useRef), and is basically the same as putAll. */
   copyRef(target: any, source: any, opt?: any) {
     if (target && source && target.hasOwnProperty('current')) {
-      values.putAll(target, source)
-      if (opt) { values.putAll(target, opt) }
+      values.putAll(target, source);
+      if (opt) { values.putAll(target, opt); }
     }
-    return target
+    return target;
   },
   getByPath(obj: any, name: string | string[]) {
-    let ret: any = C.UNDEFINED
-    let o: any
-    let klst: string[] = []
+    let ret: any = C.UNDEFINED;
+    let o: any;
+    let klst: string[] = [];
     if (name instanceof Array) {
-      klst = name
+      klst = name;
     } else if (typeof name === C.STRING) {
-      klst = name.split(/[.]/)
+      klst = name.split(/[.]/);
     }
-    o = obj
+    o = obj;
     KLOOP: for (let inx = 0; inx < klst.length; inx++) {
-      let k: any = klst[inx]
+      let k: any = klst[inx];
       if (o instanceof Array) {
-        k = Number(k)
+        k = Number(k);
         if (!isNaN(k)) {
-          o = o[k]
+          o = o[k];
         } else {
-          o = C.UNDEFINED
-          break KLOOP
+          o = C.UNDEFINED;
+          break KLOOP;
         }
       } else if (typeof o === C.OBJECT) {
 
@@ -672,32 +671,32 @@ const values = {
 
       }
     }
-    return ret
+    return ret;
   },
   range(st: any, ed?: number) {
-    let ret = []
+    let ret = [];
     if (st instanceof Array && ed === undefined) {
-      ed = Number(st[1])
-      st = Number(st[0])
+      ed = Number(st[1]);
+      st = Number(st[0]);
     } else {
-      st = Number(st)
-      ed = Number(ed)
-      if (isNaN(st)) { st = 0 }
-      if (isNaN(ed)) { ed = st }
+      st = Number(st);
+      ed = Number(ed);
+      if (isNaN(st)) { st = 0; }
+      if (isNaN(ed)) { ed = st; }
     }
-    st = Number(st)
-    ed = Number(ed)
+    st = Number(st);
+    ed = Number(ed);
     if (st <= ed) {
       for (let inx = st; inx <= ed; inx++) {
-        ret.push(inx)
+        ret.push(inx);
       }
     } else {
       for (let inx = st; inx > ed; inx--) {
-        ret.push(inx)
+        ret.push(inx);
       }
     }
-    return ret
+    return ret;
   },
 }
 
-export default values
+export default values;

@@ -1,3 +1,10 @@
+<!--
+@File        : chat-messages.vue
+@Author      : lupfeliz@gmail.com
+@Since       : 2026-01-29
+@Description : Chatting Message view
+@Site        : https://github.com/xynerzy
+-->
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue';
 import { getResource } from '@/libs/media';
@@ -84,5 +91,9 @@ const emit = defineEmits();
       </dd>
       <!--] MESSAGE-ITEM -->
     </dl>
+    <div class="chat-input-wrap">
+      <input />
+      <button></button>
+    </div>
   </section>
 </template>

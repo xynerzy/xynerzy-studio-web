@@ -6,77 +6,79 @@
  * @Site        : https://github.com/xynerzy
  **/
 /** polyfills for old browsers */
-import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
-import * as C from '@/libs/constants'
-import app from './app-context'
-import crypto from './crypto'
-import dialog from './dialog-context'
-import proc from './proc'
-import { type Function0 } from 'lodash'
+import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only';
+import * as C from '@/libs/constants';
+import app from './app-context';
+import crypto from './crypto';
+import dialog from './dialog-context';
+import proc from './proc';
+import { Function1, type Function0 } from 'lodash';
 
 type OptType = {
   method?: String
   apicd?: String
   resolve?: Function
   reject?: Function
+  complete?: Function
   /** for timeout abort */
-  abortclr: Function
+  abortclr?: Function
 } & Record<string, any>
 
-const { putAll, getConfig, log } = app
-const keepalive = true
+const { putAll, getConfig, log } = app;
+const keepalive = true;
 
 /* Creates communication headers that are basically used */
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
-  if (!opt?.noprogress) { dialog.progress(true) }
-  const headers = putAll({}, opt?.headers || {})
-  const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
+  if (!opt?.noprogress) { dialog.progress(true); }
+  const headers = putAll({}, opt?.headers || {});
+  const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000;
   /* Create an AbortController to implement timeout (for older browsers) */
-  const abortctl = new AbortController()
-  const signal = abortctl.signal
-  const url = api.mkuri(apicd)
+  const abortctl = new AbortController();
+  const signal = abortctl.signal;
+  const url = api.mkuri(apicd);
 
-  let body: any = ''
+  let body: any = '';
   if (!headers[C.CONTENT_TYPE]) {
-    headers[C.CONTENT_TYPE] = C.CTYPE_JSON
+    headers[C.CONTENT_TYPE] = C.CTYPE_JSON;
   }
   if (String(headers[C.CONTENT_TYPE]).startsWith(C.CTYPE_JSON)) {
-    body = JSON.stringify(data || {})
+    body = JSON.stringify(data || {});
   } 
   /* If the request is not processed within the timeout period, an abort signal is generated. */
-  const hndtimeout = setTimeout(() => abortctl.abort(), timeout)
+  const hndtimeout = setTimeout(() => abortctl.abort(), timeout);
   /* Clear to prevent an abort signal from occurring when normal processing is completed. */
-  const abortclr = () => clearTimeout(hndtimeout)
-  return { method, url, body, headers, signal, abortclr }
+  const abortclr = () => clearTimeout(hndtimeout);
+  return { method, url, body, headers, signal, abortclr };
 }
 
 /* Communication result processing */
 const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
+  // log.debug('MK-RES..', opt);
   let ret: any = { }
-  let resp = { } as Response
-  let hdrs = { } as Headers
-  let t: any = ''
-  const state = { error: false, message: '' }
+  let resp = { } as Response;
+  let hdrs = { } as Headers;
+  let t: any = '';
+  const state = { error: false, message: '' };
   try {
-    resp = await run()
-    hdrs = resp?.headers || { get: (v: any) => {} }
+    resp = await run();
+    hdrs = resp?.headers || { get: (v: any) => {} };
     /* Normal processing has been completed, the abort signal is canceled. */
-    opt?.abortclr && opt.abortclr()
+    opt?.abortclr && opt.abortclr();
     /* If a sign-in JWT token is found in the communication result header, it is stored in the token storage. */
     if ((t = hdrs.get(C.AUTHORIZATION.toLowerCase()))) {
-      const auth: string[] = String(t).split(' ')
+      const auth: string[] = String(t).split(' ');
       if (auth.length > 1 && auth[0] === C.BEARER) {
-        const current = new Date().getTime()
-        const decval = String(crypto.aes.decrypt(auth[1]) || '').split(' ')
-        log.debug('AUTH:', decval)
+        const current = new Date().getTime();
+        const decval = String(crypto.aes.decrypt(auth[1]) || '').split(' ');
+        log.debug('AUTH:', decval);
         if (decval && decval.length > 5) {
           /* TODO: sign-in process */
-          log.debug('CHECK:', decval[3].length, decval[3])
-          // userContext.checkExpire()
+          log.debug('CHECK:', decval[3].length, decval[3]);
+          // userContext.checkExpire();
         } else if (decval && decval.length > 3) {
           /* TODO: sign-in extend process */
           /* check expiry */
-          // userContext.checkExpire()
+          // userContext.checkExpire();
         }
       }
     }
@@ -129,14 +131,17 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
     } break
     default: }
     if (opt?.resolve) { opt.resolve(ret) }
+    if (opt?.apicd !== 'ping' && opt?.complete) { opt.complete(ret) }
   } else {
     if (!(opt?.noerror || opt?.noalert)) {
       // await app.until(() => app.astate() >= C.APPSTATE_READY)
       dialog.alert(state.message)
       ret = opt?.reject && opt.reject(state) || {} 
+      ret = opt?.reject && opt.reject(state) || {} 
     } else if (!opt?.noerror) {
       ret = opt?.reject && opt.reject(state) || {} 
     }
+    if (opt?.apicd !== 'ping' && opt?.complete) { opt.complete(ret) }
   }
   if (!opt?.noprogress) { dialog.progress(false) }
   return ret
@@ -160,7 +165,7 @@ const api = {
     })
   },
   /* process POST method */
-  async post(apicd: string, data?: any, opt?: any) {
+  async post(apicd: string, data?: any, opt?: OptType) {
     return new Promise<any>(async (resolve, reject) => {
       await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
       await api.ping(opt)
