@@ -8,13 +8,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useAttrs } from 'vue';
 import { type ChatSessionItem, type MessageItem } from '@/libs/chatting';
-import Stomp from 'stompjs';
-import SockJS from 'sockjs-client';
+import { Client, IFrame } from '@stomp/stompjs';
 
 import ChatSessions from '@/components/widgets/chat-sessions.vue';
 import ChatMessages from '@/components/widgets/chat-messages.vue';
 import api from '@/libs/api';
 import log from '@/libs/log';
+import SockJS from 'sockjs-client';
 const props = defineProps({
   title: { type: String }
 });
@@ -29,10 +29,27 @@ const data = ref({
   messages: [] as MessageItem[]
 });
 
+const curl = new URL(location.href);
 onMounted(async () => {
+  let socket: typeof SockJS;
+  const stomp = new Client({
+    webSocketFactory: () => socket = new window.SockJS(`/api/ws`) as any as typeof SockJS,
+    reconnectDelay: 5000,
+    heartbeatIncoming: 4000,
+    heartbeatOutgoing: 4000,
+    forceBinaryWSFrames: false,
+    appendMissingNULLonIncoming: true,
+    debug: (msg) => log.debug("MSG:", msg),    
+  });
+  stomp.onConnect = (v: IFrame) => {
+    log.debug('CONNECTED', v);
+  }
+  stomp.onStompError = (v) => { log.error('STOMP ERROR', v); }
+  stomp.onDisconnect = (v) => { log.error('DISCONNECT', v); }
+  stomp.onWebSocketClose = (v) => { log.error('WS CLOSE', v); }
+  stomp.onWebSocketError = (v) => { log.error('WS ERROR', v); }
+  stomp.activate();
   log.debug('START...');
-  const socket = new SockJS('');
-  const stomp = Stomp.over(socket);
   // {
   //   api.post('chat-session/list', {}, {
   //     complete(res: any) {
