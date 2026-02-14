@@ -14,6 +14,7 @@ type PutAllOptType = {
 };
 
 const values = {
+  cast<T>(v: any, t?: T): T { return v as T; },
   clone<T>(v: T) {
     let ret:T = C.UNDEFINED;
     try {
@@ -697,6 +698,6 @@ const values = {
     }
     return ret;
   },
-}
+};
 
 export default values;
