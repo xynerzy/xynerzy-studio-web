@@ -27,7 +27,7 @@ const attrs = computed(() => {
 const { cast } = values;
 const emit = defineEmits();
 const ctx = reactive({
-  chatSessions: [] as ChatSessionItem[],
+  sessions: [] as ChatSessionItem[],
   messages: [] as MessageItem[],
   socket: SockJS,
   chatSubs: C.UNDEFINED as StompSubscription,
@@ -50,17 +50,24 @@ onMounted(async () => {
     onWebSocketClose(v) { log.info('WS CLOSE', v); },
     onWebSocketError(v) { log.error('WS ERROR', v); },
     onConnect(v) {
-      log.debug('CONNECTED-1', v);
-      ctx.chatSubs = stomp.subscribe(`/api/sub/chat-data`, msg => {
-        ctx.messages = JSON.parse(msg.body);
-        log.debug('SUBSCRIBE-1:', msg.body);
+      const userId = '1234';
+      const sessionId = '5678';
+      log.debug('CONNECTED', v);
+      ctx.sessionSubs = stomp.subscribe(`/api/sub/session/${userId}`, msg => {
+        ctx.sessions = JSON.parse(msg.body);
+        log.debug('SUBSCRIBE-SESSION:', msg.body);
       });
-      ctx.sessionSubs = stomp.subscribe(`/api/sub/session-data`, msg => {
-        ctx.chatSessions = JSON.parse(msg.body);
-        log.debug('SUBSCRIBE-2:', msg.body);
+      ctx.chatSubs = stomp.subscribe(`/api/sub/chat/${sessionId}`, msg => {
+        ctx.messages = JSON.parse(msg.body);
+        log.debug('SUBSCRIBE-CHAT:', msg.body);
       });
       stomp.publish({
-        destination: `/api/pub/chat-session/test`,
+        destination: `/api/pub/session/${userId}`,
+        headers: {},
+        body: '{}'
+      });
+      stomp.publish({
+        destination: `/api/pub/chat/${sessionId}`,
         headers: {},
         body: '{}'
       });
@@ -77,7 +84,7 @@ onMounted(async () => {
     v-bind="{ ...attrs }"
     >
     <ChatSessions
-      :chat-sessions="ctx.chatSessions"
+      :chat-sessions="ctx.sessions"
       />
     <ChatMessages
       :messages="ctx.messages"
