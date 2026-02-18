@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, reactive, useAttrs } from 'vue';
 import { type ChatSessionItem, type MessageItem } from '@/libs/chatting';
-import { Client, IFrame, Stomp } from '@stomp/stompjs';
+import { Client, IFrame, Stomp, StompSubscription } from '@stomp/stompjs';
 
 import ChatSessions from '@/components/widgets/chat-sessions.vue';
 import ChatMessages from '@/components/widgets/chat-messages.vue';
@@ -29,12 +29,14 @@ const emit = defineEmits();
 const ctx = reactive({
   chatSessions: [] as ChatSessionItem[],
   messages: [] as MessageItem[],
-  socket: SockJS
+  socket: SockJS,
+  chatSubs: C.UNDEFINED as StompSubscription,
+  sessionSubs: C.UNDEFINED as StompSubscription
 });
 
 const curl = new URL(location.href);
 onMounted(async () => {
-  // let socket: /* SockJS */ = C.UNDEFINED;
+  /* SockJS is Not Compatable, so I include it from ext */
   const stomp = new Client({
     webSocketFactory: () => ctx.socket = cast(new window['SockJS'](`/api/ws`)),
     reconnectDelay: 5000,
@@ -42,23 +44,28 @@ onMounted(async () => {
     heartbeatOutgoing: 4000,
     forceBinaryWSFrames: false,
     appendMissingNULLonIncoming: true,
-    debug: (msg) => log.debug("MSG:", msg),    
+    debug(v) { log.debug('MSG:', v); },
+    onStompError(v) { log.error('STOMP ERROR', v); },
+    onDisconnect(v) { log.error('DISCONNECT', v); },
+    onWebSocketClose(v) { log.info('WS CLOSE', v); },
+    onWebSocketError(v) { log.error('WS ERROR', v); },
+    onConnect(v) {
+      log.debug('CONNECTED-1', v);
+      ctx.chatSubs = stomp.subscribe(`/api/sub/chat-data`, msg => {
+        ctx.messages = JSON.parse(msg.body);
+        log.debug('SUBSCRIBE-1:', msg.body);
+      });
+      ctx.sessionSubs = stomp.subscribe(`/api/sub/session-data`, msg => {
+        ctx.chatSessions = JSON.parse(msg.body);
+        log.debug('SUBSCRIBE-2:', msg.body);
+      });
+      stomp.publish({
+        destination: `/api/pub/chat-session/test`,
+        headers: {},
+        body: '{}'
+      });
+    },
   });
-  stomp.onConnect = (v: IFrame) => {
-    stomp.subscribe("/api/sub", msg => {
-      log.debug("SUBSCRIBE:", msg);
-    });
-    stomp.publish({
-      destination: "/api/pub/chat-session/test",
-      headers: {},
-      body: "{}"
-    });
-    log.debug('CONNECTED', v);
-  }
-  stomp.onStompError = (v) => { log.error('STOMP ERROR', v); }
-  stomp.onDisconnect = (v) => { log.error('DISCONNECT', v); }
-  stomp.onWebSocketClose = (v) => { log.info('WS CLOSE', v); }
-  stomp.onWebSocketError = (v) => { log.error('WS ERROR', v); }
   stomp.activate();
   log.debug('START...');
 });
