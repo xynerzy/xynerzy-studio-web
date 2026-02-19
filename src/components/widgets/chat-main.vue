@@ -36,6 +36,11 @@ const ctx = reactive({
 
 const curl = new URL(location.href);
 onMounted(async () => {
+  const userId = '1234';
+  const sessionId = '5678';
+  const auth: any = { };
+  auth[C.AUTHORIZATION] = `${userId}:${sessionId}`;
+  /* auth[C.AUTHORIZATION] = await api.post(...); */
   /* SockJS is Not Compatable, so I include it from ext */
   const stomp = new Client({
     webSocketFactory: () => ctx.socket = cast(new window['SockJS'](`/api/ws`)),
@@ -44,15 +49,14 @@ onMounted(async () => {
     heartbeatOutgoing: 4000,
     forceBinaryWSFrames: false,
     appendMissingNULLonIncoming: true,
+    connectHeaders: Object.assign({}, auth),
     debug(v) { log.debug('MSG:', v); },
     onStompError(v) { log.error('STOMP ERROR', v); },
     onDisconnect(v) { log.error('DISCONNECT', v); },
     onWebSocketClose(v) { log.info('WS CLOSE', v); },
     onWebSocketError(v) { log.error('WS ERROR', v); },
     onConnect(v) {
-      const userId = '1234';
-      const sessionId = '5678';
-      log.debug('CONNECTED', v);
+      log.debug('CONNECTED', v, ctx.socket);
       ctx.sessionSubs = stomp.subscribe(`/api/sub/session/${userId}`, msg => {
         ctx.sessions = JSON.parse(msg.body);
         log.debug('SUBSCRIBE-SESSION:', msg.body);
