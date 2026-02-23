@@ -6,20 +6,55 @@
 @Site        : https://github.com/xynerzy
 -->
 <script setup lang="ts">
-import { computed, ref, useAttrs } from 'vue';
+import { computed, getCurrentInstance, nextTick, onMounted, reactive, ref, useAttrs } from 'vue';
 import { getResource } from '@/libs/media';
 import { type MessageItem } from '@/libs/chatting';
+import { Client } from '@stomp/stompjs';
+import log from '@/libs/log';
 
 const props = defineProps({
-  messages: { type: Array<MessageItem> }
+  messages: { type: Array<MessageItem> },
+  mainContext: {  } as any
 });
 const attrs = computed(() => {
   const { ...itms } = useAttrs();
   return itms;
 });
-const data = ref({
+
+const self = getCurrentInstance();
+
+const ctx = reactive({
   userId: '',
   messages: computed(() => props.messages),
+  inputElement: {} as Element,
+  sendChatMessage(e?: Event) {
+    let content =  ctx.inputElement.innerHTML;
+    content = content.replaceAll(/<br[ \\/]*>/gm, '');
+    log.debug('CHECK:', content);
+    if (content) {
+      props.mainContext.stomp.publish({
+        destination: `/api/pub/chat/${props.mainContext.userInfo.sessionId}`,
+        headers: {},
+        body: JSON.stringify({
+          content: content
+        })
+      });
+      ctx.inputElement.innerHTML = '';
+    }
+  },
+  handleKeyboard(e: KeyboardEvent) {
+    switch (e.key) {
+    case 'Enter': {
+      if (e.type === 'keyup') {
+        log.debug("CHECK:", e, ctx.inputElement);
+        ctx.sendChatMessage();
+      }
+    } break;
+    default: }
+  }
+});
+onMounted(async () => {
+  ctx.inputElement = self?.refs?.inputElement as Element;
 });
 const emit = defineEmits();
 </script>
@@ -31,7 +66,7 @@ const emit = defineEmits();
     <dl class="chat-container">
       <!--[ MESSAGE-ITEM -->
       <dd
-        v-for="(itm, inx) in data.messages"
+        v-for="(itm, inx) in ctx.messages"
         :class="{
           'message-row': true,
           'sys-message' : itm.type === 'sys',
@@ -92,8 +127,16 @@ const emit = defineEmits();
       <!--] MESSAGE-ITEM -->
     </dl>
     <div class="chat-input-wrap">
-      <input />
-      <button></button>
+      <p
+        ref="inputElement"
+        @keydown="ctx.handleKeyboard"
+        @keyup="ctx.handleKeyboard"
+        contenteditable
+        ></p>
+      <button
+        @click="ctx.sendChatMessage"
+        >
+      </button>
     </div>
   </section>
 </template>

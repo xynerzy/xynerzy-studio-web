@@ -379,11 +379,15 @@ html {
             border-radius: 10px;
             margin: 5px 10px;
             padding: 5px;
-            > input {
+            > p[contenteditable] {
               background: #fff;
               border: none;
+              margin-top: 0;
+              margin-bottom: 0;
               margin-right: 5px;
               border-radius: 5px;
+              padding-top:0.2rem;
+              padding-bottom:0.2rem;
               color: #333;
               height: 25px;
               flex: auto;

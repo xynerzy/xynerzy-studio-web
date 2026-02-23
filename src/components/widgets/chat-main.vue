@@ -27,22 +27,25 @@ const attrs = computed(() => {
 const { cast } = values;
 const emit = defineEmits();
 const ctx = reactive({
+  userInfo: {
+    userId: '1234',
+    sessionId: '5678'
+  },
   sessions: [] as ChatSessionItem[],
   messages: [] as MessageItem[],
   socket: SockJS,
+  stomp: {} as Client,
   chatSubs: C.UNDEFINED as StompSubscription,
   sessionSubs: C.UNDEFINED as StompSubscription
 });
 
 const curl = new URL(location.href);
 onMounted(async () => {
-  const userId = '1234';
-  const sessionId = '5678';
   const auth: any = { };
-  auth[C.AUTHORIZATION] = `${userId}:${sessionId}`;
+  auth[C.AUTHORIZATION] = `${ctx.userInfo.userId}:${ctx.userInfo.sessionId}`;
   /* auth[C.AUTHORIZATION] = await api.post(...); */
-  /* SockJS is Not Compatable, so I include it from ext */
-  const stomp = new Client({
+  ctx.stomp = new Client({
+    /* SockJS is Not Compatable, so I include it from external */
     webSocketFactory: () => ctx.socket = cast(new window['SockJS'](`/api/ws`)),
     reconnectDelay: 5000,
     heartbeatIncoming: 4000,
@@ -57,27 +60,31 @@ onMounted(async () => {
     onWebSocketError(v) { log.error('WS ERROR', v); },
     onConnect(v) {
       log.debug('CONNECTED', v, ctx.socket);
-      ctx.sessionSubs = stomp.subscribe(`/api/sub/session/${userId}`, msg => {
+      ctx.sessionSubs = ctx.stomp.subscribe(`/api/sub/session/${ctx.userInfo.userId}`, msg => {
         ctx.sessions = JSON.parse(msg.body);
         log.debug('SUBSCRIBE-SESSION:', msg.body);
       });
-      ctx.chatSubs = stomp.subscribe(`/api/sub/chat/${sessionId}`, msg => {
-        ctx.messages = JSON.parse(msg.body);
+      ctx.chatSubs = ctx.stomp.subscribe(`/api/sub/chat/${ctx.userInfo.sessionId}`, msg => {
+        // ctx.messages = JSON.parse(msg.body);
         log.debug('SUBSCRIBE-CHAT:', msg.body);
+        const list = JSON.parse(msg.body);
+        if (list instanceof Array) {
+          for (const itm of list) { ctx.messages.push(itm); }
+        }
       });
-      stomp.publish({
-        destination: `/api/pub/session/${userId}`,
+      ctx.stomp.publish({
+        destination: `/api/pub/session/${ctx.userInfo.userId}`,
         headers: {},
         body: '{}'
       });
-      stomp.publish({
-        destination: `/api/pub/chat/${sessionId}`,
+      ctx.stomp.publish({
+        destination: `/api/pub/chat/${ctx.userInfo.sessionId}`,
         headers: {},
         body: '{}'
       });
     },
   });
-  stomp.activate();
+  ctx.stomp.activate();
   log.debug('START...');
 });
 
@@ -92,6 +99,7 @@ onMounted(async () => {
       />
     <ChatMessages
       :messages="ctx.messages"
+      :main-context="ctx"
       />
   </main>
 </template>
