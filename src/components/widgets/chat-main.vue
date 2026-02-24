@@ -32,7 +32,7 @@ const ctx = reactive({
     sessionId: '5678'
   },
   sessions: [] as ChatSessionItem[],
-  messages: [] as MessageItem[],
+  messages: {} as Record<string, MessageItem>,
   socket: SockJS,
   stomp: {} as Client,
   chatSubs: C.UNDEFINED as StompSubscription,
@@ -69,7 +69,14 @@ onMounted(async () => {
         log.debug('SUBSCRIBE-CHAT:', msg.body);
         const list = JSON.parse(msg.body);
         if (list instanceof Array) {
-          for (const itm of list) { ctx.messages.push(itm); }
+          for (const itm of list) {
+            if (!ctx.messages[itm.messageId]) {
+              ctx.messages[itm.messageId] = itm;
+            } else {
+              const el = ctx.messages[itm.messageId];
+              el.content = `${el.content}${String(itm.content).replace(/[\n]/, '<br/>')}`;
+            }
+          }
         }
       });
       ctx.stomp.publish({

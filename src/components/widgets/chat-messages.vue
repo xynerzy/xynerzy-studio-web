@@ -29,7 +29,7 @@ const ctx = reactive({
   inputElement: {} as Element,
   sendChatMessage(e?: Event) {
     let content =  ctx.inputElement.innerHTML;
-    content = content.replaceAll(/<br[ \\/]*>/gm, '');
+    content = content.replaceAll(/<br[ \t\r\n\\/]*>/gm, '\n');
     log.debug('CHECK:', content);
     if (content) {
       props.mainContext.stomp.publish({
@@ -76,7 +76,7 @@ const emit = defineEmits();
         >
         <template v-if="itm && itm.type === 'sys'">
           <div class="message-content">
-            <p> {{ itm.content }} </p>
+            <p v-html="itm.content"></p>
           </div>
         </template>
         <template v-if="itm && itm.type === 'my'">
@@ -92,7 +92,7 @@ const emit = defineEmits();
                 </dd>
               </dl>
               <div class="message-detail">
-                <p> {{ itm.content }} </p>
+                <p v-html="itm.content"></p>
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@ const emit = defineEmits();
             <h4 class="member-name">{{ itm.userId }}</h4>
             <div class="bubble-group">
               <div class="message-detail">
-                <p> {{ itm.content }} </p>
+                <p v-html="itm.content"></p>
               </div>
               <dl class="message-meta">
                 <dd class="message-time">{{ itm.time }}</dd>
