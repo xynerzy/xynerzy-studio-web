@@ -45,7 +45,7 @@ const ctx = reactive({
   handleKeyboard(e: KeyboardEvent) {
     switch (e.key) {
     case 'Enter': {
-      if (e.type === 'keyup') {
+      if (e.type === 'keyup' && !e.shiftKey) {
         log.debug("CHECK:", e, ctx.inputElement);
         ctx.sendChatMessage();
       }

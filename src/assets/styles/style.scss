@@ -373,7 +373,8 @@ html {
             }
           }
           > .chat-input-wrap {
-            height: 2rem;
+            height: auto;
+            min-height: 2rem;
             display: flex;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -389,10 +390,12 @@ html {
               padding-top:0.2rem;
               padding-bottom:0.2rem;
               color: #333;
-              height: 25px;
+              min-height: 25px;
+              height: auto;
               flex: auto;
             }
             > button {
+              cursor: pointer;
               width: 30px;
               background: #fff;
               border: 1px solid #ccc;
